@@ -1,0 +1,13 @@
+<package>
+  <description brief="elastic_strips">
+     elastic_strips
+  </description>
+  <author>Yu-Chi Lin</author>
+  <license>BSD-new</license>
+  <review status="unreviewed" notes=""/>
+  <depend package="openrave"/>
+  <export>
+    <python path="${prefix}/src"/>
+    <openrave plugins="${prefix}/lib"/>
+  </export>
+</package>

@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+ <robot name="escher">
+    <group name="l_hand">
+        <chain base_link="l_palm" tip_link="l_thumb_dist" />
+        <chain base_link="l_palm" tip_link="l_index_dist" />
+        <chain base_link="l_palm" tip_link="l_ring_dist" />
+    </group>
+
+    <group name="l_arm">
+        <chain base_link="chest" tip_link="l_wrist_yaw_bracket" />
+    </group>
+
+    <!-- Manipulator direction is changed in code -->
+    <end_effector name="l_hand" parent_link="l_hand" parent_group="l_arm" group="l_hand" />
+
+    <group name="r_hand">
+        <chain base_link="r_palm" tip_link="r_thumb_dist" />
+        <chain base_link="r_palm" tip_link="r_index_dist" />
+        <chain base_link="r_palm" tip_link="r_ring_dist" />
+    </group>
+
+    <group name="r_arm">
+        <chain base_link="chest" tip_link="r_wrist_yaw_bracket" />
+    </group>
+
+    <!-- Manipulator direction is changed in code -->
+    <end_effector name="r_hand" parent_link="r_hand" parent_group="r_arm" group="r_hand" />
+
+    <group name="l_leg">
+        <chain base_link="torso" tip_link="l_sole" />
+    </group>
+    
+    <group name="l_foot">
+	<chain base_link="l_foot" tip_link="l_sole" />
+    </group>
+    
+    <end_effector name="l_leg" parent_link="l_sole" parent_group="l_leg" group="l_foot" />
+
+    <group name="r_leg">
+        <chain base_link="torso" tip_link="r_sole" />
+    </group>
+    
+    <group name="r_foot">
+	<chain base_link="r_foot" tip_link="r_sole" />
+    </group>
+    
+    <end_effector name="r_leg" parent_link="r_sole" parent_group="r_leg" group="r_foot" />
+
+<!--     <group name="chest">
+        <chain base_link="torso" tip_link="chest" />
+    </group>
+
+    <end_effector name="chest" parent_link="chest" parent_group="chest" group="chest" /> -->
+
+    <!-- Neck, head & chest collisions -->
+    <disable_collisions link1="head" link2="chest"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="head" link2="neck"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="neck" link2="chest"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+
+    <!-- Left leg collisions -->
+    <disable_collisions link1="torso" link2="l_thigh"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="l_thigh" link2="l_shin"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="l_shin" link2="l_foot"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="l_foot" link2="l_sole"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <!-- Left arm collisions -->
+    <disable_collisions link1="l_shoulder" link2="l_upper_arm"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="l_upper_arm" link2="l_forearm"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="l_forearm" link2="l_wrist_motors"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <!-- Left hand collisions -->
+    <disable_collisions link1="l_palm" link2="l_thumb_prox"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="l_palm" link2="l_index_prox"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="l_palm" link2="l_ring_prox"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+
+    <!-- Right leg collisions -->
+    <disable_collisions link1="torso" link2="r_thigh"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="r_thigh" link2="r_shin"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="r_shin" link2="r_foot"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="r_foot" link2="r_sole"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <!-- Right arm collisions -->
+    <disable_collisions link1="r_shoulder" link2="r_upper_arm"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="r_upper_arm" link2="r_forearm"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="r_forearm" link2="r_wrist_motors"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <!-- Right hand collisions -->
+    <disable_collisions link1="r_palm" link2="r_thumb_prox"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="r_palm" link2="r_index_prox"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+    <disable_collisions link1="r_palm" link2="r_ring_prox"
+                        reason="Intermediate links have no collision meshes so these are effectively adjacent" />
+
+</robot>

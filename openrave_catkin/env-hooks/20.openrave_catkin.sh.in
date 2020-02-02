@@ -1,0 +1,9 @@
+#!/bin/sh
+
+for share_path in $(catkin_find --share | tac); do
+    OPENRAVE_PLUGINS="${share_path}/@PLUGINS_DIRECTORY@:${OPENRAVE_PLUGINS}"
+    OPENRAVE_DATA="${share_path}/@DATA_DIRECTORY@:${OPENRAVE_DATA}"
+    OPENRAVE_DATABASE="${share_path}/@DATABASES_DIRECTORY@:${OPENRAVE_DATABASES}"
+done
+
+export OPENRAVE_PLUGINS OPENRAVE_DATA OPENRAVE_DATABASES

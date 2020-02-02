@@ -1,0 +1,37 @@
+find_package(OpenRAVE REQUIRED)
+
+set(OpenRAVE_DEVEL_DIR "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_SHARE_DESTINATION}/openrave-${OpenRAVE_LIBRARY_SUFFIX}")
+set(OpenRAVE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${CATKIN_GLOBAL_SHARE_DESTINATION}/openrave-${OpenRAVE_LIBRARY_SUFFIX}")
+set(OpenRAVE_DATA_DIR "data")
+set(OpenRAVE_PLUGINS_DIR "plugins")
+set(OpenRAVE_DATABASES_DIR "databases")
+
+function (openrave_plugin target_name)
+    add_library("${target_name}" SHARED ${ARGN})
+    target_link_libraries("${target_name}" ${OpenRAVE_LIBRARIES})
+    message(STATUS ${INCLUDE_DIRECTORIES})
+    set_target_properties("${target_name}" PROPERTIES
+        PREFIX ""
+        COMPILE_FLAGS "${OpenRAVE_CXX_FLAGS}"
+        LINK_FLAGS "${OpenRAVE_LINK_FLAGS}"
+        LIBRARY_OUTPUT_DIRECTORY "${OpenRAVE_DEVEL_DIR}/${OpenRAVE_PLUGINS_DIR}"
+    )
+
+    # The target property INCLUDE_DIRECTORIES is only supported in CMake 2.8.8 and
+    # above. Ubuntu 12.04 ships with CMake 2.8.7, so we'll fall back on a global
+    # include_directories statement in this case.
+    if ("${CMAKE_VERSION}" VERSION_LESS "2.8.11")
+        include_directories(${OpenRAVE_INCLUDE_DIRS})
+    # The target_include_directories() command was introduced in CMake 2.8.11 and
+    # is the preferred method of creating a scoped include directory in future
+    # versions.
+    else ()
+        target_include_directories("${target_name}" PRIVATE "${OpenRAVE_INCLUDE_DIRS}")
+    endif ()
+
+    install(TARGETS "${target_name}"
+        ARCHIVE DESTINATION "${OpenRAVE_INSTALL_DIR}/${OpenRAVE_PLUGINS_DIR}"
+        LIBRARY DESTINATION "${OpenRAVE_INSTALL_DIR}/${OpenRAVE_PLUGINS_DIR}"
+        RUNTIME DESTINATION "${OpenRAVE_INSTALL_DIR}/${OpenRAVE_PLUGINS_DIR}"
+    )
+endfunction ()

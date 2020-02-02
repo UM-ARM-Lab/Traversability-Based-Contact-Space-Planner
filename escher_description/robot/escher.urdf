@@ -1,0 +1,1030 @@
+<?xml version="1.0" ?>
+<robot name="escher">
+  <link name="base_link">
+    <origin xyz="0 0 0.9"/>
+    <inertial>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <!-- NOTE: This is not the right way to do this-->
+  <link name="x_prismatic_link">
+    <origin xyz="0 0 0" />
+    <inertial>
+      <mass value="0" />
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+    </inertial>
+  </link>
+  <link name="y_prismatic_link">
+    <origin xyz="0 0 0" />
+    <inertial>
+      <mass value="0" />
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+    </inertial>
+  </link>
+  <link name="z_prismatic_link">
+    <origin xyz="0 0 0" />
+    <inertial>
+      <mass value="0" />
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+    </inertial>
+  </link>
+  <link name="roll_revolute_link">
+    <origin xyz="0 0 0" />
+    <inertial>
+      <mass value="0" />
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+    </inertial>
+  </link>
+  <link name="pitch_revolute_link">
+    <origin xyz="0 0 0" />
+    <inertial>
+      <mass value="0" />
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+    </inertial>
+  </link>
+  <link name="yaw_revolute_link">
+    <origin xyz="0 0 0" />
+    <inertial>
+      <mass value="0" />
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+    </inertial>
+  </link>
+  <joint name="x_prismatic_joint" type="prismatic">
+    <parent link="base_link"/>
+    <child link="x_prismatic_link"/>
+    <limit effort="1000.0" lower="-50.0" upper="50.0" velocity="1"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="1 0 0" />
+  </joint>
+  <joint name="y_prismatic_joint" type="prismatic">
+    <parent link="x_prismatic_link"/>
+    <child link="y_prismatic_link"/>
+    <limit effort="1000.0" lower="-50.0" upper="50.0" velocity="1"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 1 0" />
+  </joint>
+  <joint name="z_prismatic_joint" type="prismatic">
+    <parent link="y_prismatic_link"/>
+    <child link="z_prismatic_link"/>
+    <limit effort="1000.0" lower="-20.0" upper="20.0" velocity="1"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 0 1" />
+  </joint>
+  <joint name="roll_revolute_joint" type="revolute">
+    <parent link="z_prismatic_link"/>
+    <child link="roll_revolute_link"/>
+    <!-- <limit effort="1000.0" lower="-0.5236" higher="0.5236" velocity="1"/> -->
+    <limit effort="1000.0" lower="-0.0" higher="0.0" velocity="1"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="1 0 0" />
+  </joint>
+  <joint name="pitch_revolute_joint" type="revolute">
+    <parent link="roll_revolute_link"/>
+    <child link="pitch_revolute_link"/>
+    <!-- <limit effort="1000.0" lower="-0.5236" higher="0.5236" velocity="1"/> -->
+    <limit effort="1000.0" lower="-0.0" higher="0.0" velocity="1"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 1 0" />
+  </joint>
+  <joint name="yaw_revolute_joint" type="continuous">
+    <parent link="pitch_revolute_link"/>
+    <child link="yaw_revolute_link"/>
+    <limit effort="1000.0" velocity="1"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 0 1" />
+  </joint>
+  <joint name="base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <parent link="yaw_revolute_link"/>
+    <child link="torso"/>
+  </joint>
+  <link name="l_sole"/>
+  <link name="r_sole"/>
+  <joint name="l_sole_joint" type="fixed">
+    <origin xyz="0.025 0 -0.08"/>
+    <parent link="l_foot"/>
+    <child link="l_sole"/>
+  </joint>
+  <joint name="r_sole_joint" type="fixed">
+    <origin xyz="0.025 0 -0.08"/>
+    <parent link="r_foot"/>
+    <child link="r_sole"/>
+  </joint>
+
+
+  <joint name="l_hip_yaw" type="revolute">
+    <parent link="torso"/>
+    <child link="l_hip_yaw_trunnion"/>
+    <origin rpy="0  0  0" xyz="0   0.1  0.9"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="150.0" lower="-0.349065850399" upper="0.785398163397" velocity="12.0"/>
+  </joint>
+  <joint name="r_hip_yaw" type="revolute">
+    <parent link="torso"/>
+    <child link="r_hip_yaw_trunnion"/>
+    <origin rpy="0  0  0" xyz="0  -0.1  0.9"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="150.0" lower="-0.785398163397" upper="0.349065850399" velocity="12.0"/>
+  </joint>
+  <joint name="l_hip_roll" type="revolute">
+    <parent link="l_hip_yaw_trunnion"/>
+    <child link="l_hip_pitch_trunnion"/>
+    <origin rpy="0  0  0" xyz="0  0  0"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="150.0" lower="-0.523598775598" upper="0.785398163397" velocity="12.0"/>
+  </joint>
+  <joint name="r_hip_roll" type="revolute">
+    <parent link="r_hip_yaw_trunnion"/>
+    <child link="r_hip_pitch_trunnion"/>
+    <origin rpy="0  0  0" xyz="0  0  0"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="150.0" lower="-0.785398163397" upper="0.523598775598" velocity="12.0"/>
+  </joint>
+  <joint name="l_hip_pitch" type="revolute">
+    <parent link="l_hip_pitch_trunnion"/>
+    <child link="l_thigh"/>
+    <origin rpy="0  0  0" xyz="0  0  0"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="200.0" lower="-2.09439510239" upper="0.523598775598" velocity="12.0"/>
+  </joint>
+  <joint name="r_hip_pitch" type="revolute">
+    <parent link="r_hip_pitch_trunnion"/>
+    <child link="r_thigh"/>
+    <origin rpy="0  0  0" xyz="0  0  0"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="200.0" lower="-2.09439510239" upper="0.523598775598" velocity="12.0"/>
+  </joint>
+  <joint name="l_knee_pitch" type="revolute">
+    <parent link="l_thigh"/>
+    <child link="l_shin"/>
+    <origin rpy="0  0  0" xyz="0    0   -0.41"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="300.0" lower="0.0" upper="2.35619449019" velocity="12.0"/>
+  </joint>
+  <joint name="r_knee_pitch" type="revolute">
+    <parent link="r_thigh"/>
+    <child link="r_shin"/>
+    <origin rpy="0  0  0" xyz="0    0   -0.41"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="300.0" lower="0.0" upper="2.35619449019" velocity="12.0"/>
+  </joint>
+  <joint name="l_ankle_pitch" type="revolute">
+    <parent link="l_shin"/>
+    <child link="l_ankle_pitch_trunnion"/>
+    <origin rpy="0  0  0" xyz="0    0   -0.41"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="150.0" lower="-0.959931088597" upper="0.610865238198" velocity="12.0"/>
+  </joint>
+  <joint name="r_ankle_pitch" type="revolute">
+    <parent link="r_shin"/>
+    <child link="r_ankle_pitch_trunnion"/>
+    <origin rpy="0  0  0" xyz="0    0   -0.41"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="150.0" lower="-0.959931088597" upper="0.610865238198" velocity="12.0"/>
+  </joint>
+  <joint name="l_ankle_roll" type="revolute">
+    <parent link="l_ankle_pitch_trunnion"/>
+    <child link="l_foot"/>
+    <origin rpy="0  0  0" xyz="0  0  0"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="150.0" lower="-0.523598775598" upper="0.523598775598" velocity="12.0"/>
+  </joint>
+  <joint name="r_ankle_roll" type="revolute">
+    <parent link="r_ankle_pitch_trunnion"/>
+    <child link="r_foot"/>
+    <origin rpy="0  0  0" xyz="0  0  0"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="150.0" lower="-0.523598775598" upper="0.523598775598" velocity="12.0"/>
+  </joint>
+  <joint name="waist_yaw" type="revolute">
+    <parent link="torso"/>
+    <child link="chest"/>
+    <origin rpy="0  0  0" xyz="-0.02515  0       1.3455"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="150.0" lower="-0.785398163397" upper="0.785398163397" velocity="12.0"/>
+  </joint>
+  <joint name="head_yaw" type="revolute">
+    <parent link="chest"/>
+    <child link="neck"/>
+    <origin rpy="0  0  0" xyz="0.02515  0       0.1925"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="150.0" lower="-1.57079632679" upper="1.57079632679" velocity="12.0"/>
+  </joint>
+  <joint name="head_pitch" type="revolute">
+    <parent link="neck"/>
+    <child link="head"/>
+    <origin rpy="0  0  0" xyz="0      0      0.0286"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="150.0" lower="-0.523598775598" upper="1.0471975512" velocity="12.0"/>
+  </joint>
+  <joint name="left_camera_frame_joint" type="fixed">
+    <parent link="head"/>
+    <child link="left_camera_frame"/>
+    <origin rpy="0  0  0" xyz="0.05156  0.035    0.18627"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="0.0" lower="0.0" upper="0.0" velocity="0.0"/>
+  </joint>
+  <joint name="head_lidar_roll" type="continuous">
+    <parent link="head"/>
+    <child link="head_lidar"/>
+    <origin rpy="0  0  0" xyz="0     0     0.089"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="150.0" lower="0.0" upper="0.0" velocity="12.0"/>
+  </joint>
+  <joint name="l_shoulder_pitch" type="revolute">
+    <parent link="chest"/>
+    <child link="l_shoulder"/>
+    <origin rpy="0  0  0" xyz="0.02515  0.1275   0.1079"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="60.0" lower="-3.14159265359" upper="1.0471975512" velocity="2.0944"/>
+  </joint>
+  <joint name="r_shoulder_pitch" type="revolute">
+    <parent link="chest"/>
+    <child link="r_shoulder"/>
+    <origin rpy="0  0  0" xyz="0.02515 -0.1275   0.1079"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="60.0" lower="-3.14159265359" upper="1.0471975512" velocity="2.0944"/>
+  </joint>
+  <joint name="l_shoulder_roll" type="revolute">
+    <parent link="l_shoulder"/>
+    <child link="l_shoulder_roll_link"/>
+    <origin rpy="0  0  0" xyz="0     0.163  0"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="60.0" lower="-0.523598775598" upper="3.14159265359" velocity="2.0944"/>
+  </joint>
+  <joint name="r_shoulder_roll" type="revolute">
+    <parent link="r_shoulder"/>
+    <child link="r_shoulder_roll_link"/>
+    <origin rpy="0  0  0" xyz="0    -0.163  0"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="60.0" lower="-3.14159265359" upper="0.523598775598" velocity="2.0944"/>
+  </joint>
+  <joint name="l_shoulder_yaw" type="revolute">
+    <parent link="l_shoulder_roll_link"/>
+    <child link="l_arm"/>
+    <origin rpy="0  0  0" xyz="0  0  0"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="60.0" lower="-2.09439510239" upper="2.09439510239" velocity="2.0944"/>
+  </joint>
+  <joint name="r_shoulder_yaw" type="revolute">
+    <parent link="r_shoulder_roll_link"/>
+    <child link="r_arm"/>
+    <origin rpy="0  0  0" xyz="0  0  0"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="60.0" lower="-2.09439510239" upper="2.09439510239" velocity="2.0944"/>
+  </joint>
+  <joint name="l_elbow_pitch" type="revolute">
+    <parent link="l_arm"/>
+    <child link="l_elbow_link"/>
+    <origin rpy="0  0  0" xyz="0      0     -0.3186"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="60.0" lower="-0.523598775598" upper="3.66519142919" velocity="2.0944"/>
+  </joint>
+  <joint name="r_elbow_pitch" type="revolute">
+    <parent link="r_arm"/>
+    <child link="r_elbow_link"/>
+    <origin rpy="0  0  0" xyz="0      0     -0.3186"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="60.0" lower="-0.523598775598" upper="3.66519142919" velocity="2.0944"/>
+  </joint>
+  <joint name="l_elbow_roll" type="revolute">
+    <parent link="l_elbow_link"/>
+    <child link="l_forearm"/>
+    <origin rpy="0  0  0" xyz="0  0  0"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="60.0" lower="-2.09439510239" upper="2.09439510239" velocity="2.0944"/>
+  </joint>
+  <joint name="r_elbow_roll" type="revolute">
+    <parent link="r_elbow_link"/>
+    <child link="r_forearm"/>
+    <origin rpy="0  0  0" xyz="0  0  0"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="60.0" lower="-2.09439510239" upper="2.09439510239" velocity="2.0944"/>
+  </joint>
+  <joint name="l_wrist_pitch" type="revolute">
+    <parent link="l_forearm"/>
+    <child link="l_foreforearm"/>
+    <origin rpy="0  0  0" xyz="0.2071  0      0"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="60.0" lower="-1.57079632679" upper="1.57079632679" velocity="2.0944"/>
+  </joint>
+  <joint name="r_wrist_pitch" type="revolute">
+    <parent link="r_forearm"/>
+    <child link="r_foreforearm"/>
+    <origin rpy="0  0  0" xyz="0.2071  0      0"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="60.0" lower="-1.57079632679" upper="1.57079632679" velocity="2.0944"/>
+  </joint>
+  <joint name="l_wrist_yaw" type="revolute">
+    <parent link="l_foreforearm"/>
+    <child link="l_palm"/>
+    <origin rpy="0  0  0" xyz="0.0741  0      0"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="60.0" lower="-1.57079632679" upper="1.57079632679" velocity="2.0944"/>
+  </joint>
+  <joint name="r_wrist_yaw" type="revolute">
+    <parent link="r_foreforearm"/>
+    <child link="r_palm"/>
+    <origin rpy="0  0  0" xyz="0.0741  0      0"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="60.0" lower="-1.57079632679" upper="1.57079632679" velocity="2.0944"/>
+  </joint>
+  <joint name="l_index_yaw" type="revolute">
+    <parent link="l_palm"/>
+    <child link="l_index_link"/>
+    <origin rpy="0  0  0" xyz="0.21849  0       0.027"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="4.0" lower="-1.57079632679" upper="0.785398163397" velocity="4.1888"/>
+  </joint>
+  <joint name="r_index_yaw" type="revolute">
+    <parent link="r_palm"/>
+    <child link="r_index_link"/>
+    <origin rpy="0  0  0" xyz="0.21849  0       0.027"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="4.0" lower="-0.785398163397" upper="1.57079632679" velocity="4.1888"/>
+  </joint>
+  <joint name="l_ring_yaw" type="revolute">
+    <parent link="l_palm"/>
+    <child link="l_ring_link"/>
+    <origin rpy="0  0  0" xyz="0.21849  0      -0.027"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="4.0" lower="-1.57079632679" upper="0.785398163397" velocity="4.1888"/>
+  </joint>
+  <joint name="r_ring_yaw" type="revolute">
+    <parent link="r_palm"/>
+    <child link="r_ring_link"/>
+    <origin rpy="0  0  0" xyz="0.21849  0       0.027"/>
+    <axis xyz="0  0  1"/>
+    <limit effort="4.0" lower="-0.785398163397" upper="1.57079632679" velocity="4.1888"/>
+  </joint>
+  <joint name="l_thumb_roll" type="revolute">
+    <parent link="l_palm"/>
+    <child link="l_thumb_base"/>
+    <origin rpy="0  0  0" xyz="0.10539  0       0.01529"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="4.0" lower="-1.57079632679" upper="1.57079632679" velocity="4.1888"/>
+  </joint>
+  <joint name="r_thumb_roll" type="revolute">
+    <parent link="r_palm"/>
+    <child link="r_thumb_base"/>
+    <origin rpy="0  0  0" xyz="0.10539  0       0.01529"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="4.0" lower="-1.57079632679" upper="1.57079632679" velocity="4.1888"/>
+  </joint>
+  <joint name="l_thumb_pitch" type="revolute">
+    <parent link="l_thumb_base"/>
+    <child link="l_thumb_link"/>
+    <origin rpy="0  0  0" xyz="0.03009 -0.00214  0.05731"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="4.0" lower="-0.785398163397" upper="1.57079632679" velocity="4.1888"/>
+  </joint>
+  <joint name="r_thumb_pitch" type="revolute">
+    <parent link="r_thumb_base"/>
+    <child link="r_thumb_link"/>
+    <origin rpy="0  0  0" xyz="0.03009  0.00214  0.05731"/>
+    <axis xyz="0  1  0"/>
+    <limit effort="4.0" lower="-0.785398163397" upper="1.57079632679" velocity="4.1888"/>
+  </joint>
+  <link name="torso">
+    <inertial>
+      <mass value="12.662540836356"/>
+      <origin rpy="0  0  0" xyz="-2.75400000e-02  -8.00000000e-05   1.03335000e+00"/>
+      <inertia ixx="0.189594996" ixy="0.000243698" ixz="-0.00084363" iyy="0.165226373" iyz="2.491e-05" izz="0.191129536"/>
+    </inertial>
+    <collision name="torso_collision">
+      <origin rpy="0  0  0" xyz="-0.03035  0       1.055"/>
+      <geometry>
+        <box size="0.307 0.41 0.26"/>
+      </geometry>
+    </collision>
+    <visual name="torso_visual">
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/torso.stl OR thor_description/meshes/torso.stl OR trec_platforms/gazebo_models/escher/meshes/torso.stl OR trec_platforms/gazebo_models/thor/meshes/torso.stl OR trec_platforms/gazebo_models/saffir/meshes/torso.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_thigh">
+    <inertial>
+      <mass value="7.1064153123855"/>
+      <origin rpy="0  0  0" xyz="-0.01289  0.02119 -0.20709"/>
+      <inertia ixx="0.079832533" ixy="0.005608169" ixz="-0.014464827" iyy="0.090497961" iyz="-0.003214845" izz="0.04397275"/>
+    </inertial>
+    <collision name="l_thigh_collision">
+      <origin rpy="0   -0.15  0" xyz="-0.01694  0.032   -0.23"/>
+      <geometry>
+        <box size="0.28 0.21 0.45"/>
+      </geometry>
+    </collision>
+    <visual name="l_thigh_visual">
+      <origin rpy="0  0  0" xyz="0  -0.1 -0.9"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/l_thigh.stl OR thor_description/meshes/l_thigh.stl OR trec_platforms/gazebo_models/escher/meshes/l_thigh.stl OR trec_platforms/gazebo_models/thor/meshes/l_thigh.stl OR trec_platforms/gazebo_models/saffir/meshes/l_thigh.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_thigh">
+    <inertial>
+      <mass value="7.0991535785875"/>
+      <origin rpy="0  0  0" xyz="-0.01303 -0.02082 -0.207"/>
+      <inertia ixx="0.079523937" ixy="-0.005865006" ixz="-0.014386485" iyy="0.090222577" iyz="0.003378144" izz="0.044391657"/>
+    </inertial>
+    <collision name="r_thigh_collision">
+      <origin rpy="0   -0.18  0" xyz="-0.01694 -0.032   -0.23"/>
+      <geometry>
+        <box size="0.28 0.21 0.45"/>
+      </geometry>
+    </collision>
+    <visual name="r_thigh_visual">
+      <origin rpy="0  0  0" xyz="0   0.1 -0.9"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/r_thigh.stl OR thor_description/meshes/r_thigh.stl OR trec_platforms/gazebo_models/escher/meshes/r_thigh.stl OR trec_platforms/gazebo_models/thor/meshes/r_thigh.stl OR trec_platforms/gazebo_models/saffir/meshes/r_thigh.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_shin">
+    <inertial>
+      <mass value="4.891550698374"/>
+      <origin rpy="0  0  0" xyz="0.0392   0.00038 -0.15416"/>
+      <inertia ixx="0.049926224" ixy="-6.1882e-05" ixz="0.008459786" iyy="0.051902624" iyz="-0.000412746" izz="0.017996958"/>
+    </inertial>
+    <collision name="l_shin_collision">
+      <origin rpy="0    0.28  0" xyz="0.01907  0.00211 -0.20888"/>
+      <geometry>
+        <box size="0.13 0.16 0.4512008"/>
+      </geometry>
+    </collision>
+    <visual name="l_shin_visual">
+      <origin rpy="0  0  0" xyz="0   -0.1  -0.49"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/l_shin.stl OR thor_description/meshes/l_shin.stl OR trec_platforms/gazebo_models/escher/meshes/l_shin.stl OR trec_platforms/gazebo_models/thor/meshes/l_shin.stl OR trec_platforms/gazebo_models/saffir/meshes/l_shin.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_shin">
+    <inertial>
+      <mass value="4.8915506176771"/>
+      <origin rpy="0  0  0" xyz="0.0392  -0.00028 -0.15416"/>
+      <inertia ixx="0.049926754" ixy="8.0717e-05" ixz="0.008459765" iyy="0.051902784" iyz="0.000377725" izz="0.01799724"/>
+    </inertial>
+    <collision name="r_shin_collision">
+      <origin rpy="0    0.28  0" xyz="0.01907 -0.00211 -0.20888"/>
+      <geometry>
+        <box size="0.13 0.16 0.4512008"/>
+      </geometry>
+    </collision>
+    <visual name="r_shin_visual">
+      <origin rpy="0  0  0" xyz="0    0.1  -0.49"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/r_shin.stl OR thor_description/meshes/r_shin.stl OR trec_platforms/gazebo_models/escher/meshes/r_shin.stl OR trec_platforms/gazebo_models/thor/meshes/r_shin.stl OR trec_platforms/gazebo_models/saffir/meshes/r_shin.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_foot">
+    <inertial>
+      <mass value="1.7980371518612"/>
+      <origin rpy="0  0  0" xyz="-0.00354  0.00037 -0.04369"/>
+      <inertia ixx="0.003629189" ixy="1.3079e-05" ixz="-0.001366256" iyy="0.007181627" iyz="2.3132e-05" izz="0.007515445"/>
+    </inertial>
+    <collision name="l_foot_collision">
+      <origin rpy="0  0  0" xyz="0.025    0      -0.05327"/>
+      <geometry>
+        <box size="0.25 0.1485 0.05493235"/>
+      </geometry>
+    </collision>
+    <visual name="l_foot_visual">
+      <origin rpy="0  0  0" xyz="0   -0.1  -0.08"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/l_foot.stl OR thor_description/meshes/l_foot.stl OR trec_platforms/gazebo_models/escher/meshes/l_foot.stl OR trec_platforms/gazebo_models/thor/meshes/l_foot.stl OR trec_platforms/gazebo_models/saffir/meshes/l_foot.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_foot">
+    <inertial>
+      <mass value="1.8019124983577"/>
+      <origin rpy="0  0  0" xyz="-0.00325 -0.00035 -0.04369"/>
+      <inertia ixx="0.003638673" ixy="8.912e-06" ixz="-0.001360529" iyy="0.007191304" iyz="-2.3098e-05" izz="0.007526564"/>
+    </inertial>
+    <collision name="r_foot_collision">
+      <origin rpy="0  0  0" xyz="0.025    0      -0.05332"/>
+      <geometry>
+        <box size="0.25 0.1485 0.05493235"/>
+      </geometry>
+    </collision>
+    <visual name="r_foot_visual">
+      <origin rpy="0  0  0" xyz="0    0.1  -0.08"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/r_foot.stl OR thor_description/meshes/r_foot.stl OR trec_platforms/gazebo_models/escher/meshes/r_foot.stl OR trec_platforms/gazebo_models/thor/meshes/r_foot.stl OR trec_platforms/gazebo_models/saffir/meshes/r_foot.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_hip_yaw_trunnion">
+    <inertial>
+      <mass value="0.051728795245815"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="0.0085833333333333" ixy="0" ixz="0" iyy="0.0085833333333333" iyz="0" izz="0.00075"/>
+    </inertial>
+  </link>
+  <link name="r_hip_yaw_trunnion">
+    <inertial>
+      <mass value="0.051728795245815"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="0.0085833333333333" ixy="0" ixz="0" iyy="0.0085833333333333" iyz="0" izz="0.00075"/>
+    </inertial>
+  </link>
+  <link name="l_hip_pitch_trunnion">
+    <inertial>
+      <mass value="0.051728795245815"/>
+      <origin rpy="1.57079  0       0" xyz="0  0  0"/>
+      <inertia ixx="0.0085833333333333" ixy="0" ixz="0" iyy="0.0085833333333333" iyz="0" izz="0.00075"/>
+    </inertial>
+  </link>
+  <link name="r_hip_pitch_trunnion">
+    <inertial>
+      <mass value="0.051728795245815"/>
+      <origin rpy="1.57079  0       0" xyz="0  0  0"/>
+      <inertia ixx="0.0085833333333333" ixy="0" ixz="0" iyy="0.0085833333333333" iyz="0" izz="0.00075"/>
+    </inertial>
+  </link>
+  <link name="l_ankle_pitch_trunnion">
+    <inertial>
+      <mass value="0.051728795245815"/>
+      <origin rpy="1.57079  0       0" xyz="0  0  0"/>
+      <inertia ixx="0.0085833333333333" ixy="0" ixz="0" iyy="0.0085833333333333" iyz="0" izz="0.00075"/>
+    </inertial>
+  </link>
+  <link name="r_ankle_pitch_trunnion">
+    <inertial>
+      <mass value="0.051728795245815"/>
+      <origin rpy="1.57079  0       0" xyz="0  0  0"/>
+      <inertia ixx="0.0085833333333333" ixy="0" ixz="0" iyy="0.0085833333333333" iyz="0" izz="0.00075"/>
+    </inertial>
+  </link>
+  <link name="chest">
+    <inertial>
+      <mass value="15.967544717148"/>
+      <origin rpy="0  0  0" xyz="0.00049 -0.00057  0.00107"/>
+      <inertia ixx="0.320061097" ixy="-0.001679142" ixz="-0.006857708" iyy="0.258881187" iyz="0.005595512" izz="0.19263458"/>
+    </inertial>
+    <collision name="chest_collision">
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <geometry>
+        <box size="0.24 0.43 0.325"/>
+      </geometry>
+    </collision>
+    <visual name="chest_visual">
+      <origin rpy="0  0  0" xyz="0.02515  0      -1.3455"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/chest.stl OR thor_description/meshes/chest.stl OR rene_description/meshes/chest.stl OR trec_platforms/gazebo_models/escher/meshes/chest.stl OR trec_platforms/gazebo_models/thor/meshes/chest.stl OR trec_platforms/gazebo_models/saffir/meshes/chest.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="neck">
+    <inertial>
+      <mass value="0.4430192306267"/>
+      <origin rpy="0  0  0" xyz="0       0.00028  0.02571"/>
+      <inertia ixx="0.000347468" ixy="0" ixz="-0" iyy="0.000151286" iyz="-8.157e-06" izz="0.000333572"/>
+    </inertial>
+    <collision name="neck_collision">
+      <origin rpy="0  0  0" xyz="0       0.003    0.02152"/>
+      <geometry>
+        <box size="0.0541 0.096 0.05405"/>
+      </geometry>
+    </collision>
+    <visual name="neck_visual">
+      <origin rpy="0  0  0" xyz="0     0    -1.538"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/neck.stl OR thor_description/meshes/neck.stl OR rene_description/meshes/neck.stl OR trec_platforms/gazebo_models/escher/meshes/neck.stl OR trec_platforms/gazebo_models/thor/meshes/neck.stl OR trec_platforms/gazebo_models/saffir/meshes/neck.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="head">
+    <inertial>
+      <mass value="1.7856228555403"/>
+      <origin rpy="0  0  0" xyz="-1.90400000e-02   1.00000000e-05   1.38520000e-01"/>
+      <inertia ixx="0.009989911" ixy="3.49e-06" ixz="0.002192988" iyy="0.010295295" iyz="-8.541e-06" izz="0.003904584"/>
+    </inertial>
+    <collision name="head_collision">
+      <origin rpy="0  0  0" xyz="-0.01425  0       0.07445"/>
+      <geometry>
+        <box size="0.155386 0.122 0.2991"/>
+      </geometry>
+    </collision>
+    <visual name="head_visual">
+      <origin rpy="0  0  0" xyz="0      0     -1.5666"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/head.stl OR thor_description/meshes/head.stl OR rene_description/meshes/head.stl OR trec_platforms/gazebo_models/escher/meshes/head.stl OR trec_platforms/gazebo_models/thor/meshes/head.stl OR trec_platforms/gazebo_models/saffir/meshes/head.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="left_camera_frame">
+    <inertial>
+      <mass value="0.010345759049163"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+    </inertial>
+  </link>
+  <link name="head_lidar">
+    <inertial>
+      <mass value="0.44909881868181"/>
+      <origin rpy="0  0  0" xyz="0.02536  0      -0.00763"/>
+      <inertia ixx="0.000368817" ixy="5.5e-08" ixz="-8.417e-06" iyy="0.000869352" iyz="-2.1e-08" izz="0.000701866"/>
+    </inertial>
+    <collision name="head_lidar_collision">
+      <origin rpy="0  0  0" xyz="0.0098  0      0"/>
+      <geometry>
+        <box size="0.1395 0.06 0.093"/>
+      </geometry>
+    </collision>
+    <visual name="head_lidar_visual">
+      <origin rpy="0  0  0" xyz="0.0098  0      0"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/head_lidar.stl OR thor_description/meshes/head_lidar.stl OR rene_description/meshes/head_lidar.stl OR trec_platforms/gazebo_models/escher/meshes/head_lidar.stl OR trec_platforms/gazebo_models/thor/meshes/head_lidar.stl OR trec_platforms/gazebo_models/saffir/meshes/head_lidar.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_shoulder">
+    <inertial>
+      <mass value="1.3908820991708"/>
+      <origin rpy="0  0  0" xyz="0.00068  0.08249 -0.00011"/>
+      <inertia ixx="0.002733115" ixy="7.3154e-05" ixz="1.54e-07" iyy="0.001266362" iyz="-1.541e-06" izz="0.002795471"/>
+    </inertial>
+    <collision name="l_shoulder_collision">
+      <origin rpy="1.57079  0       0" xyz="0.00000000e+00   1.02000000e-01   3.00000000e-05"/>
+      <geometry>
+        <cylinder length="0.2" radius="0.05"/>
+      </geometry>
+    </collision>
+    <visual name="l_shoulder_visual">
+      <origin rpy="0  0  0" xyz="0     -0.1275 -1.4534"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderPitchLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderPitchLeft.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_shoulder">
+    <inertial>
+      <mass value="1.3908820991708"/>
+      <origin rpy="0  0  0" xyz="0.00069 -0.08249 -0.00011"/>
+      <inertia ixx="0.002733115" ixy="-7.2667e-05" ixz="1.21e-07" iyy="0.001266353" iyz="1.541e-06" izz="0.002795463"/>
+    </inertial>
+    <collision name="r_shoulder_collision">
+      <origin rpy="1.57079  0       0" xyz="0.00000000e+00  -1.02000000e-01   3.00000000e-05"/>
+      <geometry>
+        <cylinder length="0.2" radius="0.05"/>
+      </geometry>
+    </collision>
+    <visual name="r_shoulder_visual">
+      <origin rpy="0  0  0" xyz="0      0.1275 -1.4534"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderPitchRight.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderPitchRight.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_shoulder_roll_link">
+    <inertial>
+      <mass value="0.73371135570505"/>
+      <origin rpy="0  0  0" xyz="-1.50000000e-04  -6.00000000e-05  -1.50100000e-02"/>
+      <inertia ixx="0.000940092" ixy="-7e-09" ixz="-1.865e-06" iyy="0.000866608" iyz="2.817e-06" izz="0.000365724"/>
+    </inertial>
+    <visual name="l_shoulder_roll_link_visual">
+      <origin rpy="0  0  0" xyz="0      -0.29049 -1.45343"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderRollLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderRollLeft.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_shoulder_roll_link">
+    <inertial>
+      <mass value="0.73371135570505"/>
+      <origin rpy="0  0  0" xyz="1.50000000e-04   6.00000000e-05  -1.50100000e-02"/>
+      <inertia ixx="0.000940092" ixy="-7e-09" ixz="1.865e-06" iyy="0.000866608" iyz="-2.817e-06" izz="0.000365724"/>
+    </inertial>
+    <visual name="r_shoulder_roll_link_visual">
+      <origin rpy="0  0  0" xyz="0       0.29049 -1.45343"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderRollRight.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderRollRight.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_arm">
+    <inertial>
+      <mass value="1.3364954742869"/>
+      <origin rpy="0  0  0" xyz="0       0.00094 -0.20911"/>
+      <inertia ixx="0.007190942" ixy="-1e-09" ixz="-0" iyy="0.007116565" iyz="-0.000130703" izz="0.000965322"/>
+    </inertial>
+    <collision name="l_arm_collision">
+      <origin rpy="0  0  0" xyz="0       0      -0.21829"/>
+      <geometry>
+        <cylinder length="0.32" radius="0.05"/>
+      </geometry>
+    </collision>
+    <visual name="l_arm_visual">
+      <origin rpy="0  0  0" xyz="0      -0.29049 -1.4534"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderYawLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderYawLeft.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_arm">
+    <inertial>
+      <mass value="1.3364954742869"/>
+      <origin rpy="0  0  0" xyz="0      -0.00094 -0.20911"/>
+      <inertia ixx="0.007190942" ixy="-1e-09" ixz="0" iyy="0.007116565" iyz="0.000130703" izz="0.000965322"/>
+    </inertial>
+    <collision name="r_arm_collision">
+      <origin rpy="0  0  0" xyz="0       0      -0.21829"/>
+      <geometry>
+        <cylinder length="0.32" radius="0.05"/>
+      </geometry>
+    </collision>
+    <visual name="r_arm_visual">
+      <origin rpy="0  0  0" xyz="0       0.29049 -1.4534"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderYawRight.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderYawRight.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_elbow_link">
+    <inertial>
+      <mass value="0.95581435823612"/>
+      <origin rpy="0  0  0" xyz="1.47600000e-02   1.50000000e-04  -3.00000000e-05"/>
+      <inertia ixx="0.000477001" ixy="-2.405e-06" ixz="-4.205e-06" iyy="0.001214959" iyz="1.1e-08" izz="0.001118907"/>
+    </inertial>
+    <visual name="l_elbow_link_visual">
+      <origin rpy="0  0  0" xyz="0      -0.29049 -1.1348"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ElbowLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ElbowLeft.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_elbow_link">
+    <inertial>
+      <mass value="0.95581435823612"/>
+      <origin rpy="0  0  0" xyz="1.47600000e-02   1.50000000e-04  -3.00000000e-05"/>
+      <inertia ixx="0.000477001" ixy="-2.405e-06" ixz="-4.205e-06" iyy="0.001214959" iyz="1.1e-08" izz="0.001118907"/>
+    </inertial>
+    <visual name="r_elbow_link_visual">
+      <origin rpy="0  0  0" xyz="0       0.29049 -1.1348"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ElbowRight.stl OR trec_platforms/gazebo_models/escher/meshes/ElbowRight.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_forearm">
+    <inertial>
+      <mass value="1.0227212903647"/>
+      <origin rpy="0  0  0" xyz="1.45300000e-01  -7.50000000e-04   5.00000000e-05"/>
+      <inertia ixx="0.000942831" ixy="-3.4005e-05" ixz="2.35e-07" iyy="0.001534454" iyz="4.3e-07" izz="0.001587995"/>
+    </inertial>
+    <collision name="l_forearm_collision">
+      <origin rpy="3.14159  1.57079  3.14159" xyz="1.12600000e-01   0.00000000e+00   3.00000000e-05"/>
+      <geometry>
+        <cylinder length="0.1" radius="0.05"/>
+      </geometry>
+    </collision>
+    <visual name="l_forearm_visual">
+      <origin rpy="0  0  0" xyz="0      -0.29049 -1.1348"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/WristYawLeft.stl OR trec_platforms/gazebo_models/escher/meshes/WristYawLeft.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_forearm">
+    <inertial>
+      <mass value="1.0227212903647"/>
+      <origin rpy="0  0  0" xyz="1.45300000e-01   7.20000000e-04  -5.00000000e-05"/>
+      <inertia ixx="0.000942865" ixy="3.3796e-05" ixz="-5.48e-07" iyy="0.001532968" iyz="2.168e-06" izz="0.001589516"/>
+    </inertial>
+    <collision name="r_forearm_collision">
+      <origin rpy="3.14159  1.57079  3.14159" xyz="1.12600000e-01   0.00000000e+00   3.00000000e-05"/>
+      <geometry>
+        <cylinder length="0.1" radius="0.05"/>
+      </geometry>
+    </collision>
+    <visual name="r_forearm_visual">
+      <origin rpy="0  0  0" xyz="0       0.29049 -1.1348"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/WristYawRight.stl OR trec_platforms/gazebo_models/escher/meshes/WristYawRight.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_foreforearm">
+    <inertial>
+      <mass value="1.1603440741032"/>
+      <origin rpy="0  0  0" xyz="3.70500000e-02  -6.00000000e-05   9.00000000e-05"/>
+      <inertia ixx="0.000543674" ixy="4.334e-06" ixz="4.323e-06" iyy="0.002086265" iyz="-3.6e-08" izz="0.002086264"/>
+    </inertial>
+    <collision name="l_foreforearm_collision">
+      <origin rpy="1.57079  0       0" xyz="2.05000000e-03   0.00000000e+00   3.00000000e-05"/>
+      <geometry>
+        <cylinder length="0.08" radius="0.05"/>
+      </geometry>
+    </collision>
+    <visual name="l_foreforearm_visual">
+      <origin rpy="0  0  0" xyz="-0.2071  -0.29049 -1.1348"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/WristPitchRollLeft.stl OR trec_platforms/gazebo_models/escher/meshes/WristPitchRollLeft.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_foreforearm">
+    <inertial>
+      <mass value="1.1603440741032"/>
+      <origin rpy="0  0  0" xyz="3.70500000e-02   6.00000000e-05  -2.00000000e-05"/>
+      <inertia ixx="0.000543674" ixy="-4.334e-06" ixz="-4.323e-06" iyy="0.002086265" iyz="-3.6e-08" izz="0.002086264"/>
+    </inertial>
+    <collision name="r_foreforearm_collision">
+      <origin rpy="1.57079  0       0" xyz="2.05000000e-03   0.00000000e+00   3.00000000e-05"/>
+      <geometry>
+        <cylinder length="0.08" radius="0.05"/>
+      </geometry>
+    </collision>
+    <visual name="r_foreforearm_visual">
+      <origin rpy="0  0  0" xyz="-0.2071   0.29049 -1.1348"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/WristPitchRollRight.stl OR trec_platforms/gazebo_models/escher/meshes/WristPitchRollRight.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_palm">
+    <inertial>
+      <mass value="1.5249288992275"/>
+      <origin rpy="0  0  0" xyz="1.19000000e-01  -4.00000000e-05  -3.95000000e-03"/>
+      <inertia ixx="0.001459459" ixy="5.664e-06" ixz="8.297e-06" iyy="0.007087323" iyz="-7.05e-07" izz="0.006366048"/>
+    </inertial>
+    <collision name="l_palm_collision">
+      <origin rpy="0  0  0" xyz="0.12474  0       0.005"/>
+      <geometry>
+        <box size="0.18 0.071 0.105"/>
+      </geometry>
+    </collision>
+    <visual name="l_palm_visual">
+      <origin rpy="0  0  0" xyz="-0.2812  -0.29049 -1.1348"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/PalmLeft.stl OR trec_platforms/gazebo_models/escher/meshes/PalmLeft.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_palm">
+    <inertial>
+      <mass value="1.5249288992275"/>
+      <origin rpy="0  0  0" xyz="1.19000000e-01   1.00000000e-04  -4.74000000e-03"/>
+      <inertia ixx="0.001449269" ixy="-8.856e-06" ixz="0.000141321" iyy="0.007077146" iyz="2.94e-07" izz="0.006366035"/>
+    </inertial>
+    <collision name="r_palm_collision">
+      <origin rpy="0  0  0" xyz="0.12474  0       0.005"/>
+      <geometry>
+        <box size="0.18 0.071 0.105"/>
+      </geometry>
+    </collision>
+    <visual name="r_palm_visual">
+      <origin rpy="0  0  0" xyz="-0.2812   0.29049 -1.1348"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/PalmRight.stl OR trec_platforms/gazebo_models/escher/meshes/PalmRight.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_index_link">
+    <inertial>
+      <mass value="0.010345759049163"/>
+      <origin rpy="0  0  0" xyz="4.10900000e-02   6.10000000e-04   6.00000000e-05"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+    </inertial>
+    <collision name="l_index_link_collision">
+      <origin rpy="3.14159 -1.57079  3.14159" xyz="4.44200000e-02  -1.54000000e-03   4.00000000e-05"/>
+      <geometry>
+        <cylinder length="0.1" radius="0.025"/>
+      </geometry>
+    </collision>
+    <visual name="l_index_link_visual">
+      <origin rpy="0  0  0" xyz="-0.49969 -0.29049 -1.1618"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/PointerLeft.stl OR trec_platforms/gazebo_models/escher/meshes/PointerLeft.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_index_link">
+    <inertial>
+      <mass value="0.010345759049163"/>
+      <origin rpy="0  0  0" xyz="4.10900000e-02  -6.10000000e-04   2.00000000e-05"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+    </inertial>
+    <collision name="r_index_link_collision">
+      <origin rpy="3.14159 -1.57079  3.14159" xyz="4.44200000e-02   1.54000000e-03   4.00000000e-05"/>
+      <geometry>
+        <cylinder length="0.1" radius="0.025"/>
+      </geometry>
+    </collision>
+    <visual name="r_index_link_visual">
+      <origin rpy="0  0  0" xyz="-0.49969  0.29049 -1.1618"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/PointerRight.stl OR trec_platforms/gazebo_models/escher/meshes/PointerRight.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_ring_link">
+    <inertial>
+      <mass value="0.010345759049163"/>
+      <origin rpy="0  0  0" xyz="4.10900000e-02   6.10000000e-04   4.00000000e-05"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+    </inertial>
+    <collision name="l_ring_link_collision">
+      <origin rpy="3.14159 -1.57079  3.14159" xyz="4.44200000e-02  -1.54000000e-03   3.00000000e-05"/>
+      <geometry>
+        <cylinder length="0.1" radius="0.025"/>
+      </geometry>
+    </collision>
+    <visual name="l_ring_link_visual">
+      <origin rpy="0  0  0" xyz="-0.49969 -0.29049 -1.10779"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/RingLeft.stl OR trec_platforms/gazebo_models/escher/meshes/RingLeft.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_ring_link">
+    <inertial>
+      <mass value="0.010345759049163"/>
+      <origin rpy="0  0  0" xyz="0.04109 -0.00061 -0.05398"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+    </inertial>
+    <collision name="r_ring_link_collision">
+      <origin rpy="3.14159 -1.57079  3.14159" xyz="0.04442  0.00154 -0.05396"/>
+      <geometry>
+        <cylinder length="0.1" radius="0.025"/>
+      </geometry>
+    </collision>
+    <visual name="r_ring_link_visual">
+      <origin rpy="0  0  0" xyz="-0.49969  0.29049 -1.1618"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/RingRight.stl OR trec_platforms/gazebo_models/escher/meshes/RingRight.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_thumb_base">
+    <inertial>
+      <mass value="0.18707426326041"/>
+      <origin rpy="0  0  0" xyz="2.90300000e-02  -4.00000000e-05   2.21000000e-02"/>
+      <inertia ixx="7.244e-05" ixy="-9e-09" ixz="4.69e-07" iyy="6.6527e-05" iyz="-2.64e-07" izz="4.7191e-05"/>
+    </inertial>
+    <visual name="l_thumb_base_visual">
+      <origin rpy="0  0  0" xyz="-0.38659 -0.29049 -1.15009"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ThumbBaseLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ThumbBaseLeft.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_thumb_base">
+    <inertial>
+      <mass value="0.18707426326041"/>
+      <origin rpy="0  0  0" xyz="2.90300000e-02   4.00000000e-05   2.21000000e-02"/>
+      <inertia ixx="7.244e-05" ixy="9e-09" ixz="4.69e-07" iyy="6.6527e-05" iyz="2.64e-07" izz="4.7191e-05"/>
+    </inertial>
+    <visual name="r_thumb_base_visual">
+      <origin rpy="0  0  0" xyz="-0.38659  0.29049 -1.15009"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ThumbBaseRight.stl OR trec_platforms/gazebo_models/escher/meshes/ThumbBaseRight.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="l_thumb_link">
+    <inertial>
+      <mass value="0.010345759049163"/>
+      <origin rpy="0  0  0" xyz="-6.10000000e-04  -1.00000000e-05   4.08100000e-02"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+    </inertial>
+    <collision name="l_thumb_link_collision">
+      <origin rpy="0  0  0" xyz="0.00154  0       0.05414"/>
+      <geometry>
+        <cylinder length="0.1" radius="0.025"/>
+      </geometry>
+    </collision>
+    <visual name="l_thumb_link_visual">
+      <origin rpy="0  0  0" xyz="-0.41668 -0.28835 -1.2074"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ThumbLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ThumbLeft.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="r_thumb_link">
+    <inertial>
+      <mass value="0.010345759049163"/>
+      <origin rpy="0  0  0" xyz="-6.10000000e-04  -1.00000000e-05   4.08100000e-02"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+    </inertial>
+    <collision name="r_thumb_link_collision">
+      <origin rpy="0  0  0" xyz="0.00154  0       0.05414"/>
+      <geometry>
+        <cylinder length="0.1" radius="0.025"/>
+      </geometry>
+    </collision>
+    <visual name="r_thumb_link_visual">
+      <origin rpy="0  0  0" xyz="-0.41668  0.28835 -1.2074"/>
+      <geometry>
+        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ThumbRight.stl OR trec_platforms/gazebo_models/escher/meshes/ThumbRight.stl" scale=".001 .001 .001"/>
+      </geometry>
+    </visual>
+  </link>
+</robot>
