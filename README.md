@@ -3,7 +3,7 @@ Traversability-based Contact Space Planner
 
 Traversability-based contact space planner code release. Given environment specified as a set of polygonal surface and a robot model, the code generate contact sequence for a humanoid robot. We provide an example with the [Escher humanoid robot](https://icat.vt.edu/projects/2015-2016/major/escher-humanoid-robot.html) model. The code is written in Python 2.7 and tested in Ubuntu 14.04 with ROS Indigo.
 
-Installation
+Setup
 ------------
 * Install [OpenRAVE](https://github.com/rdiankov/openrave), [Installation Guide](https://scaron.info/teaching/installing-openrave-on-ubuntu-14.04.html) (Tested Commit: 7c5f5e27eec2b2ef10aa63fbc519a998c276f908)
 * Install [ROS](http://wiki.ros.org/indigo/Installation/Ubuntu)
@@ -33,6 +33,9 @@ Installation
   sudo mkdir cdd
   sudo mv cdd_f.h cddmp_f.h cddtypes_f.h cdd.h cddmp.h cddtypes.h setoper.h cdd
   ```
+
+* Create a catkin workspace and clone the repo under `/path/to/catkin/workspace/src`, run `catkin_make` in `/path/to/catkin/workspace` to build the code.
+* Before running the code, `source /path/to/catkin/workspace/devel/setup.bash`.
 
 Usage
 -----
