@@ -154,17 +154,3 @@ class HumanoidRobot:
         self.hand_collision_box_3.InitFromBoxes(hand_collision_box_parameter,False)
         self.env.AddKinBody(self.hand_collision_box_3)
         self.hand_collision_box_3.SetTransform(out_of_env_transform)
-
-    def move_body_to_collision_box_transform(self, collision_box_transform):
-
-        affine_dofs = SE3_to_xyzrpy(np.dot(self.origin_body_transform, np.dot(collision_box_transform, self.inverse_body_collision_box_offset)))
-
-        dof_values = self.robot.GetDOFValues()
-        dof_values[self.DOFNameIndexDict['x_prismatic_joint']] = affine_dofs[0]
-        dof_values[self.DOFNameIndexDict['y_prismatic_joint']] = affine_dofs[1]
-        dof_values[self.DOFNameIndexDict['z_prismatic_joint']] = affine_dofs[2]
-        dof_values[self.DOFNameIndexDict['roll_revolute_joint']] = affine_dofs[3] * DEG2RAD
-        dof_values[self.DOFNameIndexDict['pitch_revolute_joint']] = affine_dofs[4] * DEG2RAD
-        dof_values[self.DOFNameIndexDict['yaw_revolute_joint']] = affine_dofs[5] * DEG2RAD
-
-        self.robot.SetDOFValues(dof_values)

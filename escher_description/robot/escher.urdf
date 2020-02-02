@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
 <robot name="escher">
+
   <link name="base_link">
     <origin xyz="0 0 0.9"/>
     <inertial>
@@ -74,16 +75,18 @@
   <joint name="roll_revolute_joint" type="revolute">
     <parent link="z_prismatic_link"/>
     <child link="roll_revolute_link"/>
-    <!-- <limit effort="1000.0" lower="-0.5236" higher="0.5236" velocity="1"/> -->
-    <limit effort="1000.0" lower="-0.0" higher="0.0" velocity="1"/>
+    <limit effort="1000.0" lower="-0.5236" upper="0.5236" velocity="1"/>
+    <!-- <limit effort="1000.0" lower="-0.1" upper="0.1" velocity="1"/> -->
+    <!-- <limit effort="1000.0" lower="-0.01" upper="0.01" velocity="1"/> -->
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <axis xyz="1 0 0" />
   </joint>
   <joint name="pitch_revolute_joint" type="revolute">
     <parent link="roll_revolute_link"/>
     <child link="pitch_revolute_link"/>
-    <!-- <limit effort="1000.0" lower="-0.5236" higher="0.5236" velocity="1"/> -->
-    <limit effort="1000.0" lower="-0.0" higher="0.0" velocity="1"/>
+    <limit effort="1000.0" lower="-0.5236" upper="0.5236" velocity="1"/>
+    <!-- <limit effort="1000.0" lower="-0.1" upper="0.1" velocity="1"/> -->
+    <!-- <limit effort="1000.0" lower="-0.01" upper="0.01" velocity="1"/> -->
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <axis xyz="0 1 0" />
   </joint>
@@ -112,7 +115,6 @@
     <parent link="r_foot"/>
     <child link="r_sole"/>
   </joint>
-
 
   <joint name="l_hip_yaw" type="revolute">
     <parent link="torso"/>
@@ -176,6 +178,7 @@
     <origin rpy="0  0  0" xyz="0    0   -0.41"/>
     <axis xyz="0  1  0"/>
     <limit effort="150.0" lower="-0.959931088597" upper="0.610865238198" velocity="12.0"/>
+    <!-- <limit effort="150.0" lower="-0.80031088597" upper="0.610865238198" velocity="12.0"/> -->
   </joint>
   <joint name="r_ankle_pitch" type="revolute">
     <parent link="r_shin"/>
@@ -183,6 +186,7 @@
     <origin rpy="0  0  0" xyz="0    0   -0.41"/>
     <axis xyz="0  1  0"/>
     <limit effort="150.0" lower="-0.959931088597" upper="0.610865238198" velocity="12.0"/>
+    <!-- <limit effort="150.0" lower="-0.800931088597" upper="0.610865238198" velocity="12.0"/> -->
   </joint>
   <joint name="l_ankle_roll" type="revolute">
     <parent link="l_ankle_pitch_trunnion"/>
@@ -190,6 +194,7 @@
     <origin rpy="0  0  0" xyz="0  0  0"/>
     <axis xyz="1  0  0"/>
     <limit effort="150.0" lower="-0.523598775598" upper="0.523598775598" velocity="12.0"/>
+    <!-- <limit effort="150.0" lower="-0.123598775598" upper="0.123598775598" velocity="12.0"/> -->
   </joint>
   <joint name="r_ankle_roll" type="revolute">
     <parent link="r_ankle_pitch_trunnion"/>
@@ -204,6 +209,7 @@
     <origin rpy="0  0  0" xyz="-0.02515  0       1.3455"/>
     <axis xyz="0  0  1"/>
     <limit effort="150.0" lower="-0.785398163397" upper="0.785398163397" velocity="12.0"/>
+    <!-- <limit effort="150.0" lower="-0.485398163397" upper="0.485398163397" velocity="12.0"/> -->
   </joint>
   <joint name="head_yaw" type="revolute">
     <parent link="chest"/>
@@ -309,6 +315,7 @@
     <origin rpy="0  0  0" xyz="0.2071  0      0"/>
     <axis xyz="0  1  0"/>
     <limit effort="60.0" lower="-1.57079632679" upper="1.57079632679" velocity="2.0944"/>
+    <!-- <limit effort="60.0" lower="-1.57079632679" upper="0" velocity="2.0944"/> -->
   </joint>
   <joint name="r_wrist_pitch" type="revolute">
     <parent link="r_forearm"/>
@@ -316,20 +323,23 @@
     <origin rpy="0  0  0" xyz="0.2071  0      0"/>
     <axis xyz="0  1  0"/>
     <limit effort="60.0" lower="-1.57079632679" upper="1.57079632679" velocity="2.0944"/>
+    <!-- <limit effort="60.0" lower="-1.57079632679" upper="0" velocity="2.0944"/> -->
   </joint>
   <joint name="l_wrist_yaw" type="revolute">
     <parent link="l_foreforearm"/>
     <child link="l_palm"/>
     <origin rpy="0  0  0" xyz="0.0741  0      0"/>
     <axis xyz="0  0  1"/>
-    <limit effort="60.0" lower="-1.57079632679" upper="1.57079632679" velocity="2.0944"/>
+    <!-- <limit effort="60.0" lower="-1.57079632679" upper="1.57079632679" velocity="2.0944"/> -->
+    <limit effort="60.0" lower="-0.0002" upper="1.57079632679" velocity="2.0944"/>
   </joint>
   <joint name="r_wrist_yaw" type="revolute">
     <parent link="r_foreforearm"/>
     <child link="r_palm"/>
     <origin rpy="0  0  0" xyz="0.0741  0      0"/>
     <axis xyz="0  0  1"/>
-    <limit effort="60.0" lower="-1.57079632679" upper="1.57079632679" velocity="2.0944"/>
+    <!-- <limit effort="60.0" lower="-1.57079632679" upper="1.57079632679" velocity="2.0944"/> -->
+    <limit effort="60.0" lower="-1.57079632679" upper="0.0002" velocity="2.0944"/>
   </joint>
   <joint name="l_index_yaw" type="revolute">
     <parent link="l_palm"/>
@@ -402,7 +412,7 @@
     <visual name="torso_visual">
       <origin rpy="0  0  0" xyz="0  0  0"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/torso.stl OR thor_description/meshes/torso.stl OR trec_platforms/gazebo_models/escher/meshes/torso.stl OR trec_platforms/gazebo_models/thor/meshes/torso.stl OR trec_platforms/gazebo_models/saffir/meshes/torso.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/torso.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -421,7 +431,7 @@
     <visual name="l_thigh_visual">
       <origin rpy="0  0  0" xyz="0  -0.1 -0.9"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/l_thigh.stl OR thor_description/meshes/l_thigh.stl OR trec_platforms/gazebo_models/escher/meshes/l_thigh.stl OR trec_platforms/gazebo_models/thor/meshes/l_thigh.stl OR trec_platforms/gazebo_models/saffir/meshes/l_thigh.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/l_thigh.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -440,7 +450,7 @@
     <visual name="r_thigh_visual">
       <origin rpy="0  0  0" xyz="0   0.1 -0.9"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/r_thigh.stl OR thor_description/meshes/r_thigh.stl OR trec_platforms/gazebo_models/escher/meshes/r_thigh.stl OR trec_platforms/gazebo_models/thor/meshes/r_thigh.stl OR trec_platforms/gazebo_models/saffir/meshes/r_thigh.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/r_thigh.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -459,7 +469,7 @@
     <visual name="l_shin_visual">
       <origin rpy="0  0  0" xyz="0   -0.1  -0.49"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/l_shin.stl OR thor_description/meshes/l_shin.stl OR trec_platforms/gazebo_models/escher/meshes/l_shin.stl OR trec_platforms/gazebo_models/thor/meshes/l_shin.stl OR trec_platforms/gazebo_models/saffir/meshes/l_shin.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/l_shin.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -478,7 +488,7 @@
     <visual name="r_shin_visual">
       <origin rpy="0  0  0" xyz="0    0.1  -0.49"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/r_shin.stl OR thor_description/meshes/r_shin.stl OR trec_platforms/gazebo_models/escher/meshes/r_shin.stl OR trec_platforms/gazebo_models/thor/meshes/r_shin.stl OR trec_platforms/gazebo_models/saffir/meshes/r_shin.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/r_shin.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -497,7 +507,7 @@
     <visual name="l_foot_visual">
       <origin rpy="0  0  0" xyz="0   -0.1  -0.08"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/l_foot.stl OR thor_description/meshes/l_foot.stl OR trec_platforms/gazebo_models/escher/meshes/l_foot.stl OR trec_platforms/gazebo_models/thor/meshes/l_foot.stl OR trec_platforms/gazebo_models/saffir/meshes/l_foot.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/l_foot.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -516,7 +526,7 @@
     <visual name="r_foot_visual">
       <origin rpy="0  0  0" xyz="0    0.1  -0.08"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/r_foot.stl OR thor_description/meshes/r_foot.stl OR trec_platforms/gazebo_models/escher/meshes/r_foot.stl OR trec_platforms/gazebo_models/thor/meshes/r_foot.stl OR trec_platforms/gazebo_models/saffir/meshes/r_foot.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/r_foot.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -564,7 +574,7 @@
   </link>
   <link name="chest">
     <inertial>
-      <mass value="15.967544717148"/>
+      <mass value="9.867544717148"/>
       <origin rpy="0  0  0" xyz="0.00049 -0.00057  0.00107"/>
       <inertia ixx="0.320061097" ixy="-0.001679142" ixz="-0.006857708" iyy="0.258881187" iyz="0.005595512" izz="0.19263458"/>
     </inertial>
@@ -577,7 +587,7 @@
     <visual name="chest_visual">
       <origin rpy="0  0  0" xyz="0.02515  0      -1.3455"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/chest.stl OR thor_description/meshes/chest.stl OR rene_description/meshes/chest.stl OR trec_platforms/gazebo_models/escher/meshes/chest.stl OR trec_platforms/gazebo_models/thor/meshes/chest.stl OR trec_platforms/gazebo_models/saffir/meshes/chest.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/chest.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -596,7 +606,7 @@
     <visual name="neck_visual">
       <origin rpy="0  0  0" xyz="0     0    -1.538"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/neck.stl OR thor_description/meshes/neck.stl OR rene_description/meshes/neck.stl OR trec_platforms/gazebo_models/escher/meshes/neck.stl OR trec_platforms/gazebo_models/thor/meshes/neck.stl OR trec_platforms/gazebo_models/saffir/meshes/neck.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/neck.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -615,7 +625,7 @@
     <visual name="head_visual">
       <origin rpy="0  0  0" xyz="0      0     -1.5666"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/head.stl OR thor_description/meshes/head.stl OR rene_description/meshes/head.stl OR trec_platforms/gazebo_models/escher/meshes/head.stl OR trec_platforms/gazebo_models/thor/meshes/head.stl OR trec_platforms/gazebo_models/saffir/meshes/head.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/head.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -641,7 +651,7 @@
     <visual name="head_lidar_visual">
       <origin rpy="0  0  0" xyz="0.0098  0      0"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/head_lidar.stl OR thor_description/meshes/head_lidar.stl OR rene_description/meshes/head_lidar.stl OR trec_platforms/gazebo_models/escher/meshes/head_lidar.stl OR trec_platforms/gazebo_models/thor/meshes/head_lidar.stl OR trec_platforms/gazebo_models/saffir/meshes/head_lidar.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/head_lidar.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -660,7 +670,7 @@
     <visual name="l_shoulder_visual">
       <origin rpy="0  0  0" xyz="0     -0.1275 -1.4534"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderPitchLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderPitchLeft.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ShoulderPitchLeft.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -679,7 +689,7 @@
     <visual name="r_shoulder_visual">
       <origin rpy="0  0  0" xyz="0      0.1275 -1.4534"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderPitchRight.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderPitchRight.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ShoulderPitchRight.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -692,7 +702,7 @@
     <visual name="l_shoulder_roll_link_visual">
       <origin rpy="0  0  0" xyz="0      -0.29049 -1.45343"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderRollLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderRollLeft.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ShoulderRollLeft.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -705,7 +715,7 @@
     <visual name="r_shoulder_roll_link_visual">
       <origin rpy="0  0  0" xyz="0       0.29049 -1.45343"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderRollRight.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderRollRight.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ShoulderRollRight.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -724,7 +734,7 @@
     <visual name="l_arm_visual">
       <origin rpy="0  0  0" xyz="0      -0.29049 -1.4534"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderYawLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderYawLeft.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ShoulderYawLeft.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -743,7 +753,7 @@
     <visual name="r_arm_visual">
       <origin rpy="0  0  0" xyz="0       0.29049 -1.4534"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ShoulderYawRight.stl OR trec_platforms/gazebo_models/escher/meshes/ShoulderYawRight.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ShoulderYawRight.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -756,7 +766,7 @@
     <visual name="l_elbow_link_visual">
       <origin rpy="0  0  0" xyz="0      -0.29049 -1.1348"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ElbowLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ElbowLeft.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ElbowLeft.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -769,7 +779,7 @@
     <visual name="r_elbow_link_visual">
       <origin rpy="0  0  0" xyz="0       0.29049 -1.1348"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ElbowRight.stl OR trec_platforms/gazebo_models/escher/meshes/ElbowRight.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ElbowRight.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -788,7 +798,7 @@
     <visual name="l_forearm_visual">
       <origin rpy="0  0  0" xyz="0      -0.29049 -1.1348"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/WristYawLeft.stl OR trec_platforms/gazebo_models/escher/meshes/WristYawLeft.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/WristYawLeft.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -807,7 +817,7 @@
     <visual name="r_forearm_visual">
       <origin rpy="0  0  0" xyz="0       0.29049 -1.1348"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/WristYawRight.stl OR trec_platforms/gazebo_models/escher/meshes/WristYawRight.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/WristYawRight.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -826,7 +836,7 @@
     <visual name="l_foreforearm_visual">
       <origin rpy="0  0  0" xyz="-0.2071  -0.29049 -1.1348"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/WristPitchRollLeft.stl OR trec_platforms/gazebo_models/escher/meshes/WristPitchRollLeft.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/WristPitchRollLeft.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -845,7 +855,7 @@
     <visual name="r_foreforearm_visual">
       <origin rpy="0  0  0" xyz="-0.2071   0.29049 -1.1348"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/WristPitchRollRight.stl OR trec_platforms/gazebo_models/escher/meshes/WristPitchRollRight.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/WristPitchRollRight.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -864,7 +874,7 @@
     <visual name="l_palm_visual">
       <origin rpy="0  0  0" xyz="-0.2812  -0.29049 -1.1348"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/PalmLeft.stl OR trec_platforms/gazebo_models/escher/meshes/PalmLeft.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/PalmLeft.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -883,7 +893,7 @@
     <visual name="r_palm_visual">
       <origin rpy="0  0  0" xyz="-0.2812   0.29049 -1.1348"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/PalmRight.stl OR trec_platforms/gazebo_models/escher/meshes/PalmRight.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/PalmRight.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -902,7 +912,7 @@
     <visual name="l_index_link_visual">
       <origin rpy="0  0  0" xyz="-0.49969 -0.29049 -1.1618"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/PointerLeft.stl OR trec_platforms/gazebo_models/escher/meshes/PointerLeft.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/PointerLeft.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -921,7 +931,7 @@
     <visual name="r_index_link_visual">
       <origin rpy="0  0  0" xyz="-0.49969  0.29049 -1.1618"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/PointerRight.stl OR trec_platforms/gazebo_models/escher/meshes/PointerRight.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/PointerRight.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -940,7 +950,7 @@
     <visual name="l_ring_link_visual">
       <origin rpy="0  0  0" xyz="-0.49969 -0.29049 -1.10779"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/RingLeft.stl OR trec_platforms/gazebo_models/escher/meshes/RingLeft.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/RingLeft.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -959,7 +969,7 @@
     <visual name="r_ring_link_visual">
       <origin rpy="0  0  0" xyz="-0.49969  0.29049 -1.1618"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/RingRight.stl OR trec_platforms/gazebo_models/escher/meshes/RingRight.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/RingRight.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -972,7 +982,7 @@
     <visual name="l_thumb_base_visual">
       <origin rpy="0  0  0" xyz="-0.38659 -0.29049 -1.15009"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ThumbBaseLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ThumbBaseLeft.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ThumbBaseLeft.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -985,7 +995,7 @@
     <visual name="r_thumb_base_visual">
       <origin rpy="0  0  0" xyz="-0.38659  0.29049 -1.15009"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ThumbBaseRight.stl OR trec_platforms/gazebo_models/escher/meshes/ThumbBaseRight.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ThumbBaseRight.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -1004,7 +1014,7 @@
     <visual name="l_thumb_link_visual">
       <origin rpy="0  0  0" xyz="-0.41668 -0.28835 -1.2074"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ThumbLeft.stl OR trec_platforms/gazebo_models/escher/meshes/ThumbLeft.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ThumbLeft.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
@@ -1023,7 +1033,7 @@
     <visual name="r_thumb_link_visual">
       <origin rpy="0  0  0" xyz="-0.41668  0.28835 -1.2074"/>
       <geometry>
-        <mesh filename="package://trec_platforms/gazebo_models/escher/meshes/ThumbRight.stl OR trec_platforms/gazebo_models/escher/meshes/ThumbRight.stl" scale=".001 .001 .001"/>
+        <mesh filename="package://escher_description/robot/meshes/ThumbRight.stl" scale=".001 .001 .001"/>
       </geometry>
     </visual>
   </link>
