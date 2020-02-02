@@ -674,7 +674,7 @@ class environment_handler:
 
             structures = []
 
-            if surface_source == 'random_surface_load_from_data':
+            if surface_source == 'load_from_data':
 
                 if file_path is None:
                     print('No file path provided.')
@@ -732,7 +732,7 @@ class environment_handler:
 
                 self.extend_trivial_corridor(structures,corridor_transform=xyzrpy_to_SE3([-0.3,0,0,0,0,0]),corridor_dimension=(7.5,1.5))
 
-            elif surface_source == 'mix_test_environment_2':
+            elif surface_source == 'two_corridor_environment':
                 # set a patch size as 1.5 x 1.5 m
 
                 env_anchor_x = random.random() * (-1.0-(-3.5)) - 3.5
@@ -776,7 +776,7 @@ class environment_handler:
                 self.construct_room(structures, (env_anchor_x+first_room_x_dimension+corridor_length,env_anchor_y), patch_size,
                                     (second_room_x_dimension,second_room_y_dimension), [[],[],[],[0,3]])
 
-            elif surface_source == 'mix_test_environment_stair':
+            elif surface_source == 'two_stair_environment':
 
                 second_room_height = random.random() * 0.5 + 1.0
 

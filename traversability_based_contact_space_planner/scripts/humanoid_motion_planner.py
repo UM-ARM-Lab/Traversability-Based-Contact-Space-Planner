@@ -89,20 +89,19 @@ def get_segment_explore_sequence(path_segments):
     return segment_explore_sequence
 
 
-def main(meta_path_generation_method='all_planning',
-         path_segmentation_generation_type = 'motion_mode_and_traversability_segmentation',
-         traversability_select_criterion='mean',
+def main(contact_sequence_generation_method='all_planning',
+         path_segmentation_type = 'motion_mode_and_traversability_segmentation',
+         traversability_threshold_type='mean',
          traversability_threshold = 0.3,
-         environment_path='environment',
-         surface_source='mix_test_environment',
+         environment_path='environment_two_corridor',
+         surface_source='two_corridor_environment',
          log_file_name='exp_result.txt',
          start_env_id=0,
          end_env_id=9999,
          recording_data=False,
-         use_env_transition_bias=False,
          load_planning_result=False):
 
-    rave.raveLogInfo('Using %s method...'%(meta_path_generation_method))
+    rave.raveLogInfo('Using %s method...'%(contact_sequence_generation_method))
 
     if taking_planning_result_log:
         rave.raveLogInfo('Taking log. Store in %s.'%(log_file_name))
@@ -457,7 +456,7 @@ def main(meta_path_generation_method='all_planning',
             ##### Work on get_torso_path_segment if we want to further decompose this path to smaller segments #####
             torso_path_segmentation = get_torso_path_segmentation(dh_grid,
                                                                   torso_path,
-                                                                  path_segmentation_generation_type=path_segmentation_generation_type,
+                                                                  path_segmentation_type=path_segmentation_type,
                                                                   traversability_threshold=traversability_threshold)
             num_segments = len(torso_path_segmentation[0])
 
@@ -491,13 +490,13 @@ def main(meta_path_generation_method='all_planning',
                 torso_path_segment_motion_mode = torso_path_segment_indices_and_motion_mode[2]
                 new_path_segment = path_segment(torso_path_segment_indices,torso_path_segment_motion_mode)
 
-                if meta_path_generation_method == 'all_planning':
+                if contact_sequence_generation_method == 'all_planning':
                     new_path_segment.path_generation_method  = 'planning'
 
-                elif meta_path_generation_method == 'all_retrieval':
+                elif contact_sequence_generation_method == 'all_retrieval':
                     new_path_segment.path_generation_method  = 'retrieval'
 
-                elif meta_path_generation_method == 'hybrid':
+                elif contact_sequence_generation_method == 'hybrid':
                     new_torso_segment = torso_path[torso_path_segment_indices[0]:torso_path_segment_indices[1]+1]
                     segment_traversability_score_mean = get_torso_path_segment_traversability_score_mean(dh_grid,
                                                                                                         new_torso_segment,
@@ -507,13 +506,13 @@ def main(meta_path_generation_method='all_planning',
                                                                                                     new_torso_segment,
                                                                                                     torso_path_segment_motion_mode)
 
-                    if traversability_select_criterion == 'mean':
+                    if traversability_threshold_type == 'mean':
                         if segment_traversability_score_mean >= traversability_threshold:
                             new_path_segment.path_generation_method  = 'retrieval'
                         else:
                             new_path_segment.path_generation_method  = 'planning'
 
-                    elif traversability_select_criterion == 'max':
+                    elif traversability_threshold_type == 'max':
                         if segment_traversability_score_max >= traversability_threshold:
                             new_path_segment.path_generation_method = 'retrieval'
                         else:
@@ -526,7 +525,7 @@ def main(meta_path_generation_method='all_planning',
 
                 for i in range(torso_path_segment_indices[0],torso_path_segment_indices[1]+1):
                     if i != torso_path_segment_indices[0]:
-                        if path_segmentation_generation_type == 'no_segmentation':
+                        if path_segmentation_type == 'no_segmentation':
                             DrawGridPath([torso_path[i].get_position(),torso_path[i-1].get_position()], env, dh_grid,
                                           [0,0,0],z=1.4,style='single')
                         else:
@@ -645,7 +644,7 @@ def main(meta_path_generation_method='all_planning',
                         dh_grid_segment_goal = dh_grid_original
                         torso_path_segment_neighbor_indices = dh_grid_segment_goal.get_neighbor_cell_indices(torso_path_segment)
 
-                        local_torso_path_segment = dh_grid_segment_goal.path_planning(segment_goal,start=segment_start,method='A_Star',direction='backward',exhaust_the_map=False,env_transition_bias=use_env_transition_bias,search_space=torso_path_segment_neighbor_indices)
+                        local_torso_path_segment = dh_grid_segment_goal.path_planning(segment_goal,start=segment_start,method='A_Star',direction='backward',exhaust_the_map=False,search_space=torso_path_segment_neighbor_indices)
 
                         motion_plan_library_mm = motion_plan_library_list[motion_mode]
                         motion_plan_clusters_mm = motion_plan_clusters_list[motion_mode]
@@ -752,7 +751,7 @@ def main(meta_path_generation_method='all_planning',
 
                         # final segment or the next segment is also using planning
                         if segment_index == (num_segments-1) or next_segment.contact_state_path is None:
-                            dijkstra_map_constructed = dh_grid_segment_goal.path_planning(segment_goal,start=None,method='Dijkstra',direction='backward',exhaust_the_map=True,env_transition_bias=use_env_transition_bias,search_space=torso_path_segment_neighbor_indices)
+                            dijkstra_map_constructed = dh_grid_segment_goal.path_planning(segment_goal,start=None,method='Dijkstra',direction='backward',exhaust_the_map=True,search_space=torso_path_segment_neighbor_indices)
                             # DrawRegion(or_robot.env,xyzrpy_to_SE3([segment_goal[0],segment_goal[1],0.1,0,0,segment_goal[2]]),goal_br)
 
                             initial_node.h = h_estimation(initial_node.left_leg,
@@ -777,7 +776,7 @@ def main(meta_path_generation_method='all_planning',
                                                         planning_time_limit=ANA_time_limit,
                                                         preferred_planning_time=min(ANA_time_limit-1.0,len(torso_path_segment)*5.0))
                             else:
-                                if path_segmentation_generation_type == 'no_segmentation':
+                                if path_segmentation_type == 'no_segmentation':
                                     segment_path = ANA_Star(general_ik_interface, or_robot, structures, dh_grid_segment_goal,
                                                             goal=segment_goal, initial_node=initial_node,
                                                             step_transition_model=step_transition_model,
@@ -813,7 +812,7 @@ def main(meta_path_generation_method='all_planning',
                             segment_goal_pose = segment_goal_node.get_mean_feet_xyzrpy()
                             tentative_segment_goal = [segment_goal_pose[0],segment_goal_pose[1],segment_goal_pose[5]] # try to set the goal to where the contact pose is at
 
-                            dijkstra_map_constructed = dh_grid_segment_goal.path_planning(tentative_segment_goal,start=None,method='Dijkstra',direction='backward',exhaust_the_map=True,env_transition_bias=use_env_transition_bias,search_space=torso_path_segment_neighbor_indices)
+                            dijkstra_map_constructed = dh_grid_segment_goal.path_planning(tentative_segment_goal,start=None,method='Dijkstra',direction='backward',exhaust_the_map=True,search_space=torso_path_segment_neighbor_indices)
 
                             segment_goal = tentative_segment_goal
 
@@ -1326,17 +1325,16 @@ def main(meta_path_generation_method='all_planning',
 
 if __name__ == "__main__":
 
-    meta_path_generation_method = 'all_planning'
-    path_segmentation_generation_type = 'motion_mode_and_traversability_segmentation'
+    contact_sequence_generation_method = 'hybrid'
+    path_segmentation_type = 'motion_mode_and_traversability_segmentation'
     traversability_threshold = 0.3
-    traversability_select_criterion = 'mean'
-    surface_source = 'mix_test_environment_2'
-    environment_path = 'environment'
-    log_file_name = 'exp_result_dummy.txt'
+    traversability_threshold_type = 'mean'
+    surface_source = 'two_corridor_environment'
+    environment_path = 'environment_two_corridor'
+    log_file_name = 'exp_result.txt'
     start_env_id = 0
-    end_env_id = 9999
+    end_env_id = start_env_id
     recording_data = False
-    use_env_transition_bias = False
     load_planning_result = False
 
     i = 1
@@ -1345,10 +1343,10 @@ if __name__ == "__main__":
         command = sys.argv[i]
         i += 1
 
-        if command == 'meta_path_generation_method':
-            meta_path_generation_method = sys.argv[i]
-        elif command == 'path_segmentation_generation_type':
-            path_segmentation_generation_type = sys.argv[i]
+        if command == 'contact_sequence_generation_method':
+            contact_sequence_generation_method = sys.argv[i]
+        elif command == 'path_segmentation_type':
+            path_segmentation_type = sys.argv[i]
         elif command == 'traversability_threshold':
             traversability_threshold = float(sys.argv[i])
         elif command == 'surface_source':
@@ -1364,11 +1362,6 @@ if __name__ == "__main__":
                 recording_data = False
             else:
                 recording_data = True
-        elif command == 'use_env_transition_bias':
-            if int(sys.argv[i]) == 0:
-                use_env_transition_bias = False
-            else:
-                use_env_transition_bias = True
         elif command == 'load_planning_result':
             if int(sys.argv[i]) == 0:
                 load_planning_result = False
@@ -1376,11 +1369,11 @@ if __name__ == "__main__":
                 load_planning_result = True
         elif command == 'environment_path':
             environment_path = sys.argv[i]
-        elif command == 'traversability_select_criterion':
+        elif command == 'traversability_threshold_type':
             if sys.argv[i] == 'mean':
-                traversability_select_criterion = 'mean'
+                traversability_threshold_type = 'mean'
             elif sys.argv[i] == 'max':
-                traversability_select_criterion = 'max'
+                traversability_threshold_type = 'max'
             else:
                 rave.raveLogInfo('Unknown traversability select criterion: %s. Abort.'%(sys.argv[i]))
                 sys.exit()
@@ -1391,9 +1384,9 @@ if __name__ == "__main__":
         i += 1
 
     rave.raveLogInfo('Motion Planner Command:')
-    rave.raveLogInfo('meta_path_generation_method: %s'%(meta_path_generation_method))
-    rave.raveLogInfo('path_segmentation_generation_type: %s'%(path_segmentation_generation_type))
-    rave.raveLogInfo('traversability_select_criterion: %s'%(traversability_select_criterion))
+    rave.raveLogInfo('contact_sequence_generation_method: %s'%(contact_sequence_generation_method))
+    rave.raveLogInfo('path_segmentation_type: %s'%(path_segmentation_type))
+    rave.raveLogInfo('traversability_threshold_type: %s'%(traversability_threshold_type))
     rave.raveLogInfo('traversability_threshold: %5.2f'%(traversability_threshold))
     rave.raveLogInfo('environment_path: %s'%(environment_path))
     rave.raveLogInfo('surface_source: %s'%(surface_source))
@@ -1401,12 +1394,11 @@ if __name__ == "__main__":
     rave.raveLogInfo('start_env_id: %d'%(start_env_id))
     rave.raveLogInfo('end_env_id: %d'%(end_env_id))
     rave.raveLogInfo('recording_data: %r'%(recording_data))
-    rave.raveLogInfo('use_env_transition_bias: %r'%(use_env_transition_bias))
     rave.raveLogInfo('load_planning_result: %r'%(load_planning_result))
 
-    main(meta_path_generation_method = meta_path_generation_method,
-         path_segmentation_generation_type = path_segmentation_generation_type,
-         traversability_select_criterion = traversability_select_criterion,
+    main(contact_sequence_generation_method = contact_sequence_generation_method,
+         path_segmentation_type = path_segmentation_type,
+         traversability_threshold_type = traversability_threshold_type,
          traversability_threshold = traversability_threshold,
          environment_path = environment_path,
          surface_source = surface_source,
@@ -1414,5 +1406,4 @@ if __name__ == "__main__":
          start_env_id = start_env_id,
          end_env_id = end_env_id,
          recording_data = recording_data,
-         use_env_transition_bias = use_env_transition_bias,
          load_planning_result = load_planning_result)

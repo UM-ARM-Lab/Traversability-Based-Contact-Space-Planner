@@ -207,9 +207,9 @@ def exhaustive_search_segmentations(dh_grid,torso_path,motion_mode,traversabilit
     return optimal_segmentation
 
 
-def get_torso_path_segmentation(dh_grid,torso_path,path_segmentation_generation_type='motion_mode_and_traversability_segmentation',traversability_threshold=0.3):
+def get_torso_path_segmentation(dh_grid,torso_path,path_segmentation_type='motion_mode_and_traversability_segmentation',traversability_threshold=0.3):
 
-    if path_segmentation_generation_type == 'random':
+    if path_segmentation_type == 'random':
         cut_point_num = len(torso_path)-2
         max_segment_num = len(torso_path)-1
 
@@ -230,7 +230,7 @@ def get_torso_path_segmentation(dh_grid,torso_path,path_segmentation_generation_
 
         path_segmentation = (segmentation,normalized_segmentation_num,segmentation_score)
 
-    elif path_segmentation_generation_type == 'motion_mode_segmentation':
+    elif path_segmentation_type == 'motion_mode_segmentation':
         last_motion_mode = None
         segment_start_index = 0
         path_segment_list = []
@@ -253,7 +253,7 @@ def get_torso_path_segmentation(dh_grid,torso_path,path_segmentation_generation_
 
         path_segmentation = (path_segment_list,1.0,1.0)
 
-    elif path_segmentation_generation_type == 'motion_mode_and_traversability_segmentation':
+    elif path_segmentation_type == 'motion_mode_and_traversability_segmentation':
         last_motion_mode = None
         segment_start_index = 0
         motion_mode_path_segment_list = []
@@ -306,7 +306,7 @@ def get_torso_path_segmentation(dh_grid,torso_path,path_segmentation_generation_
 
         path_segmentation = (path_segment_list,1.0,1.0)
 
-    elif path_segmentation_generation_type == 'specified':
+    elif path_segmentation_type == 'specified':
         # path_segmentation = ([(0,int(len(torso_path)/2.0)),(int(len(torso_path)/2.0),len(torso_path)-1)],2.0/(len(torso_path)-1),1.0)
         # path_segmentation = ([(0,len(torso_path)-1,'legs_only')],1.0,1.0)
         path_segmentation = ([(0,int(len(torso_path)/4.0),0),
@@ -315,10 +315,10 @@ def get_torso_path_segmentation(dh_grid,torso_path,path_segmentation_generation_
                               (int(3.0*len(torso_path)/4.0),len(torso_path)-1,2)]
                               ,1.0,1.0)
 
-    elif path_segmentation_generation_type == 'no_segmentation':
+    elif path_segmentation_type == 'no_segmentation':
         path_segmentation = ([(0,len(torso_path)-1,3)],1.0,1.0)
 
-    elif path_segmentation_generation_type == 'all_manipulator_only':
+    elif path_segmentation_type == 'all_manipulator_only':
         path_segmentation = ([(0,len(torso_path)-1,2)],1.0,1.0)
 
     return path_segmentation
