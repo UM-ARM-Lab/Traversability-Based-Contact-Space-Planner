@@ -15,15 +15,17 @@ Installation
   ```
   wget ftp://ftp.math.ethz.ch/users/fukudak/cdd/cddlib-094h.tar.gz
   tar -xvf cddlib-094h.tar.gz
+  cd cddlib-094h
   ```
   or from github:
   ```
-  git clone https://github.com/cddlib/cddlib/tree/0.94h
+  git clone https://github.com/cddlib/cddlib.git
+  cd cddlib-094h
+  git checkout 0.94h
   ```
   Install cddlib and dependencies:
   ```
   sudo apt-get install libgmp3-dev
-  cd cddlib-094h
   ./configure
   make
   sudo make install
