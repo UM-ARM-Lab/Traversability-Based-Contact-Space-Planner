@@ -136,9 +136,9 @@ class map_grid:
 
         # load the regressor
         try:
-            print('Load env_feature_regressor_two_hands...', end='')
-            out_file = open(planning_data_path+'env_feature_regressor_full_manipulators','r')
-            self.env_feature_regressor_two_hands = pickle.load(out_file)
+            print('Load traversability_regressor_two_hands...', end='')
+            out_file = open(planning_data_path+'traversability_regressor_full_manipulators','r')
+            self.traversability_regressor_two_hands = pickle.load(out_file)
             out_file.close()
             print('Done.')
         except Exception:
@@ -146,9 +146,9 @@ class map_grid:
             return
 
         try:
-            print('Load env_feature_regressor_legs_and_one_hand...', end='')
-            out_file = open(planning_data_path+'env_feature_regressor_legs_and_one_hand','r')
-            self.env_feature_regressor_one_hand = pickle.load(out_file)
+            print('Load traversability_regressor_legs_and_one_hand...', end='')
+            out_file = open(planning_data_path+'traversability_regressor_legs_and_one_hand','r')
+            self.traversability_regressor_one_hand = pickle.load(out_file)
             out_file.close()
             print('Done.')
         except Exception:
@@ -156,9 +156,9 @@ class map_grid:
             return
 
         try:
-            print('Load env_feature_regressor_legs_only...', end='')
-            out_file = open(planning_data_path+'env_feature_regressor_legs_only','r')
-            self.env_feature_regressor_legs_only = pickle.load(out_file)
+            print('Load traversability_regressor_legs_only...', end='')
+            out_file = open(planning_data_path+'traversability_regressor_legs_only','r')
+            self.traversability_regressor_legs_only = pickle.load(out_file)
             out_file.close()
             print('Done.')
         except Exception:
@@ -299,14 +299,14 @@ class map_grid:
                 max_env_transition_num = -sys.maxint
                 all_motion_mode_env_transition_num = [0,0,0,0]
 
-                env_feature_regressor_list = [self.env_feature_regressor_two_hands[goal_index], # legs and two hands
-                                              self.env_feature_regressor_one_hand[goal_index], # legs and left hand
-                                              self.env_feature_regressor_one_hand[goal_index], # legs and right hand
-                                              self.env_feature_regressor_legs_only[goal_index]] # legs only
+                traversability_regressor_list = [self.traversability_regressor_two_hands[goal_index], # legs and two hands
+                                                 self.traversability_regressor_one_hand[goal_index], # legs and left hand
+                                                 self.traversability_regressor_one_hand[goal_index], # legs and right hand
+                                                 self.traversability_regressor_legs_only[goal_index]] # legs only
 
                 with sklearn.config_context(assume_finite=True):
 
-                    for motion_mode_index,regressor_tuple in enumerate(env_feature_regressor_list):
+                    for motion_mode_index,regressor_tuple in enumerate(traversability_regressor_list):
 
                         if motion_mode_index not in possible_motion_mode_index_list:
                             continue

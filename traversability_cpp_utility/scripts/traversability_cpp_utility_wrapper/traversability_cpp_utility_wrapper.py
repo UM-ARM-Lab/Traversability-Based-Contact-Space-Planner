@@ -24,8 +24,8 @@ class traversability_cpp_utility_wrapper(object):
     # OpenRave C++ plugin is called by sending string command. We can add parameters in this function to construct the command, and decode in C++ side.
     # For example, I can add an option whether to turn on the parallelization or not
 
-    def SendStartCalculatingTraversabilityCommand(self, structures=None,  footstep_windows_legs_only=None, footstep_windows=None, torso_transitions=None, footstep_window_grid_resolution=None,
-                                                dh_grid=None, hand_transition_model=None, parallelization=None, printing=False):
+    def SendStartCalculatingTraversabilityCommand(self, structures=None, footstep_windows_legs_only=None, footstep_windows=None, torso_transitions=None, footstep_window_grid_resolution=None,
+                                                torso_pose_grid=None, hand_transition_model=None, parallelization=None, printing=False):
         start = time.time()
 
         cmd = ['StartCalculatingTraversability']
@@ -102,57 +102,57 @@ class traversability_cpp_utility_wrapper(object):
             cmd.append('footstep_window_grid_resolution')
             cmd.append(footstep_window_grid_resolution)
 
-        if dh_grid is not None:
+        if torso_pose_grid is not None:
             cmd.append('map_grid')
-            cmd.append(dh_grid.min_x)
-            cmd.append(dh_grid.max_x)
-            cmd.append(dh_grid.min_y)
-            cmd.append(dh_grid.max_y)
-            cmd.append(dh_grid.resolution)
+            cmd.append(torso_pose_grid.min_x)
+            cmd.append(torso_pose_grid.max_x)
+            cmd.append(torso_pose_grid.min_y)
+            cmd.append(torso_pose_grid.max_y)
+            cmd.append(torso_pose_grid.resolution)
 
-            for i in range(dh_grid.dim_x):
-                for j in range(dh_grid.dim_y):
+            for i in range(torso_pose_grid.dim_x):
+                for j in range(torso_pose_grid.dim_y):
 
-                    cmd.append(dh_grid.cell_2D_list[i][j].height)
+                    cmd.append(torso_pose_grid.cell_2D_list[i][j].height)
 
-                    if dh_grid.cell_2D_list[i][j].foot_ground_projection[0]:
+                    if torso_pose_grid.cell_2D_list[i][j].foot_ground_projection[0]:
                         cmd.append(1)
                     else:
                         cmd.append(0)
 
-                    if dh_grid.cell_2D_list[i][j].foot_ground_projection[1] is None:
+                    if torso_pose_grid.cell_2D_list[i][j].foot_ground_projection[1] is None:
                         cmd.append(-99)
                     else:
-                        cmd.append(dh_grid.cell_2D_list[i][j].foot_ground_projection[1])
+                        cmd.append(torso_pose_grid.cell_2D_list[i][j].foot_ground_projection[1])
 
-                    cmd.append(len(dh_grid.cell_2D_list[i][j].all_ground_structures))
-                    cmd.extend(dh_grid.cell_2D_list[i][j].all_ground_structures)
+                    cmd.append(len(torso_pose_grid.cell_2D_list[i][j].all_ground_structures))
+                    cmd.extend(torso_pose_grid.cell_2D_list[i][j].all_ground_structures)
 
-                    for k in range(dh_grid.dim_theta):
-                        if dh_grid.cell_3D_list[i][j][k].parent is not None:
-                            cmd.extend(dh_grid.cell_3D_list[i][j][k].parent.get_indices())
+                    for k in range(torso_pose_grid.dim_theta):
+                        if torso_pose_grid.cell_3D_list[i][j][k].parent is not None:
+                            cmd.extend(torso_pose_grid.cell_3D_list[i][j][k].parent.get_indices())
                         else:
                             cmd.extend((-99,-99,-99))
-                        cmd.append(dh_grid.cell_3D_list[i][j][k].g)
-                        cmd.append(dh_grid.cell_3D_list[i][j][k].h)
+                        cmd.append(torso_pose_grid.cell_3D_list[i][j][k].g)
+                        cmd.append(torso_pose_grid.cell_3D_list[i][j][k].h)
 
-                        cmd.append(len(dh_grid.cell_3D_list[i][j][k].left_hand_checking_surface_index))
-                        cmd.extend(dh_grid.cell_3D_list[i][j][k].left_hand_checking_surface_index)
-                        cmd.append(len(dh_grid.cell_3D_list[i][j][k].right_hand_checking_surface_index))
-                        cmd.extend(dh_grid.cell_3D_list[i][j][k].right_hand_checking_surface_index)
+                        cmd.append(len(torso_pose_grid.cell_3D_list[i][j][k].left_hand_checking_surface_index))
+                        cmd.extend(torso_pose_grid.cell_3D_list[i][j][k].left_hand_checking_surface_index)
+                        cmd.append(len(torso_pose_grid.cell_3D_list[i][j][k].right_hand_checking_surface_index))
+                        cmd.extend(torso_pose_grid.cell_3D_list[i][j][k].right_hand_checking_surface_index)
 
             # import IPython; IPython.embed()
-            for key,window in dh_grid.left_foot_neighbor_window.iteritems():
+            for key,window in torso_pose_grid.left_foot_neighbor_window.iteritems():
                 cmd.append(len(window))
                 for cell in window:
                     cmd.extend(cell)
 
-            for key,window in dh_grid.right_foot_neighbor_window.iteritems():
+            for key,window in torso_pose_grid.right_foot_neighbor_window.iteritems():
                 cmd.append(len(window))
                 for cell in window:
                     cmd.extend(cell)
 
-            for key,window in dh_grid.chest_neighbor_window.iteritems():
+            for key,window in torso_pose_grid.chest_neighbor_window.iteritems():
                 cmd.append(len(window))
                 for cell in window:
                     cmd.extend(cell)

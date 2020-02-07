@@ -137,7 +137,6 @@ class trimesh_surface(structure):
 		for x in range(int(math.floor((self.max_proj_x-self.min_proj_x)/surface_slice_resolution))+1):
 			self.approx_boundary[x] = []
 
-
 		for boundary in self.boundaries:
 			x1 = self.projected_vertices[boundary[0]][0]
 			y1 = self.projected_vertices[boundary[0]][1]

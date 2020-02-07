@@ -220,7 +220,6 @@ class environment_handler:
 
         for i in range(4):
             surface_vertex = np.dot(surface_transform_matrix,np.array([[init_surface_vertices[i][0]],[init_surface_vertices[i][1]],[0],[1]],dtype=float))
-
             surface_vertices[i] = (surface_vertex[0,0],surface_vertex[1,0],surface_vertex[2,0])
 
 
@@ -654,7 +653,7 @@ class environment_handler:
             self.construct_mixed_wall(structures, [x,y,z,0,0,yaw], patch_size, 20, wall_length, doors[i])
 
 
-    def update_environment(self,or_robot,file_path=None,surface_source='flat_ground_environment',save_stl=True):
+    def update_environment(self,or_robot,file_path=None,surface_source='flat_ground_environment'):
 
         if self.structures is not None:
             for struct in self.structures:
@@ -806,10 +805,6 @@ class environment_handler:
 
                 self.extend_mixed_stair(structures, [env_anchor_x+first_room_x_dimension,env_anchor_y+patch_size/2.0,0,0,0,0], stair_length=corridor_length,stair_width=1.5,stair_step_depth=0.5,stair_step_height=second_room_height/9.0,max_tilt_angle=20)
                 self.extend_mixed_stair(structures, [env_anchor_x+first_room_x_dimension,env_anchor_y+first_room_y_dimension-patch_size/2.0,0,0,0,0], stair_length=corridor_length,stair_width=1.5,stair_step_depth=0.5,stair_step_height=second_room_height/9.0,max_tilt_angle=20)
-
-                # self.extend_mixed_corridor(structures, [env_anchor_x+first_room_x_dimension,env_anchor_y+patch_size/2.0,0,0,0,0], patch_size, corridor_length)
-
-                # self.extend_mixed_corridor(structures, [env_anchor_x+first_room_x_dimension,env_anchor_y+first_room_y_dimension-patch_size/2.0,0,0,0,0], patch_size, corridor_length)
 
                 second_room_x_dimension = 4.5
                 second_room_y_dimension = 6.0

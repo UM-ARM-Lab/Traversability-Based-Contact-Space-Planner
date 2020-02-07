@@ -54,7 +54,7 @@ def DrawPaths(current,env,handles=None):
         c = c.parent
 
 
-def DrawGridPath(grid_path,env,dh_grid,color,z=0.2,size_ratio=1.0,handles=None,y_offset=0,style='single'):
+def DrawGridPath(grid_path,env,torso_pose_grid,color,z=0.2,size_ratio=1.0,handles=None,y_offset=0,style='single'):
 
     arrow_length = 0.1
     if(handles is None):
@@ -357,11 +357,11 @@ def DrawSurface(env,struct,transparency=1.0,style='greyscale'):
     draw_handles.append(env.drawtrimesh(struct.kinbody.GetLinks()[0].GetCollisionData().vertices,struct.kinbody.GetLinks()[0].GetCollisionData().indices,colors=np.array([r,g,b,transparency])))
 
 
-def DrawCells(env,cell_indices_set,dh_grid):
+def DrawCells(env,cell_indices_set,torso_pose_grid):
     cell_indices_list = list(cell_indices_set)
 
     for cell_indices in cell_indices_list:
-        position = dh_grid.grid_to_position(cell_indices)
+        position = torso_pose_grid.grid_to_position(cell_indices)
 
         lines_points = np.zeros((2,3),dtype=float)
         lines_points[0,:] = np.array([position[0],position[1],0.2])

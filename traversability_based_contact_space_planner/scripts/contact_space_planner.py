@@ -4,6 +4,7 @@ import heapq
 import openravepy as rave
 import copy
 import time
+import sys
 import IPython
 
 from config_parameter import *
@@ -273,7 +274,7 @@ class node:
 
 
 ### Heuristic estimate given the contact poses of a state
-def h_estimation(left_leg,right_leg,left_arm,right_arm,or_robot,dh_grid,motion_mode=0,heuristics='dijkstra',print_cost=False,goal=None,exact_goal_pose=None):
+def h_estimation(left_leg,right_leg,left_arm,right_arm,or_robot,torso_pose_grid,motion_mode=0,heuristics='dijkstra',print_cost=False,goal=None,exact_goal_pose=None):
 
     goal_x = goal[0]
     goal_y = goal[1]
@@ -305,13 +306,13 @@ def h_estimation(left_leg,right_leg,left_arm,right_arm,or_robot,dh_grid,motion_m
 
         euclid_dist_to_goal = math.sqrt((goal_x-mean_x)**2 + (goal_y-mean_y)**2)
 
-        (mean_ix,mean_iy,mean_itheta) = dh_grid.position_to_grid((mean_x,mean_y,mean_theta))
+        (mean_ix,mean_iy,mean_itheta) = torso_pose_grid.position_to_grid((mean_x,mean_y,mean_theta))
 
-        (grid_x,grid_y,grid_theta) = dh_grid.grid_to_position((mean_ix,mean_iy,mean_itheta))
+        (grid_x,grid_y,grid_theta) = torso_pose_grid.grid_to_position((mean_ix,mean_iy,mean_itheta))
 
         grid_euclid_dist_to_goal = math.sqrt((goal_x-grid_x)**2 + (goal_y-grid_y)**2)
 
-        grid_to_goal_dist = dh_grid.grid_to_dist((mean_ix,mean_iy,mean_itheta))
+        grid_to_goal_dist = torso_pose_grid.grid_to_dist((mean_ix,mean_iy,mean_itheta))
         if (grid_to_goal_dist == 4999.0 or grid_to_goal_dist == 9999.0) and making_exact_foot_contact:
             grid_to_goal_dist = 0.0
 
@@ -398,7 +399,7 @@ def h_estimation(left_leg,right_leg,left_arm,right_arm,or_robot,dh_grid,motion_m
 
 
 ### Project foot contact onto the ground. Return True if there is a projection.
-def ground_mapping(or_robot,node,structures_dict,dh_grid,mapping_manip='all'):
+def ground_mapping(or_robot,node,structures_dict,torso_pose_grid,mapping_manip='all'):
 
     ## Decide which foot we need to project.
     checking_left_foot = False
@@ -420,7 +421,7 @@ def ground_mapping(or_robot,node,structures_dict,dh_grid,mapping_manip='all'):
 
     ## Project left foot.
     if checking_left_foot:
-        left_foot_projection_prediciton = dh_grid.get_foot_ground_projection((node.left_leg[0],node.left_leg[1]))
+        left_foot_projection_prediciton = torso_pose_grid.get_foot_ground_projection((node.left_leg[0],node.left_leg[1]))
         left_safe_footstep = left_foot_projection_prediciton[0]
         projection_surface_id = left_foot_projection_prediciton[1]
 
@@ -440,7 +441,7 @@ def ground_mapping(or_robot,node,structures_dict,dh_grid,mapping_manip='all'):
 
     ## Project right foot.
     if checking_right_foot:
-        right_foot_projection_prediciton = dh_grid.get_foot_ground_projection((node.right_leg[0],node.right_leg[1]))
+        right_foot_projection_prediciton = torso_pose_grid.get_foot_ground_projection((node.right_leg[0],node.right_leg[1]))
         right_safe_footstep = right_foot_projection_prediciton[0]
         projection_surface_id = right_foot_projection_prediciton[1]
 
@@ -544,7 +545,7 @@ def wall_mapping(or_robot,link_no,arm_orientation,node,structures,env=None):
 
 
 ### Find all branches from the current state.
-def branching(current,goal,step_transition_model,hand_transition_model,structures,structures_dict,or_robot,NodeDict,openHeap,G,dh_grid,exact_goal_pose,motion_modes,heuristics='dijkstra',goal_node=None):
+def branching(current,goal,step_transition_model,hand_transition_model,structures,structures_dict,or_robot,NodeDict,openHeap,G,torso_pose_grid,exact_goal_pose,motion_modes,heuristics='dijkstra',goal_node=None):
 
     current_left_leg = copy.copy(current.left_leg)
     current_right_leg = copy.copy(current.right_leg)
@@ -567,7 +568,7 @@ def branching(current,goal,step_transition_model,hand_transition_model,structure
             right_hand_structures.append(structures[i])
 
 
-    (ix,iy,itheta) = dh_grid.position_to_grid((current_mean_x,current_mean_y,current_mean_yaw))
+    (ix,iy,itheta) = torso_pose_grid.position_to_grid((current_mean_x,current_mean_y,current_mean_yaw))
 
     branching_factor = 0
 
@@ -660,26 +661,26 @@ def branching(current,goal,step_transition_model,hand_transition_model,structure
 
                 if link_no == 0:
                     if (new_left_leg == current_left_leg or
-                        new_left_leg[0] >= dh_grid.max_x or
-                        new_left_leg[0] < dh_grid.min_x or
-                        new_left_leg[1] >= dh_grid.max_y or
-                        new_left_leg[1] < dh_grid.min_y):
+                        new_left_leg[0] >= torso_pose_grid.max_x or
+                        new_left_leg[0] < torso_pose_grid.min_x or
+                        new_left_leg[1] >= torso_pose_grid.max_y or
+                        new_left_leg[1] < torso_pose_grid.min_y):
                         continue
                     child_node = node(new_left_leg,current_right_leg,current_left_arm,current_right_arm,current.g+edge_cost,current.h,current,link_no)
                 elif link_no == 1:
                     if (new_right_leg == current_right_leg or
-                        new_right_leg[0] >= dh_grid.max_x or
-                        new_right_leg[0] < dh_grid.min_x or
-                        new_right_leg[1] >= dh_grid.max_y or
-                        new_right_leg[1] < dh_grid.min_y):
+                        new_right_leg[0] >= torso_pose_grid.max_x or
+                        new_right_leg[0] < torso_pose_grid.min_x or
+                        new_right_leg[1] >= torso_pose_grid.max_y or
+                        new_right_leg[1] < torso_pose_grid.min_y):
                         continue
                     child_node = node(current_left_leg,new_right_leg,current_left_arm,current_right_arm,current.g+edge_cost,current.h,current,link_no)
 
                 child_node.edge_cost = edge_cost
 
 
-                if branching_to_exact_goal_pose or ground_mapping(or_robot,child_node,structures_dict,dh_grid):
-                    child_node.h = h_estimation(child_node.left_leg,child_node.right_leg,child_node.left_arm,child_node.right_arm,or_robot,dh_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal)
+                if branching_to_exact_goal_pose or ground_mapping(or_robot,child_node,structures_dict,torso_pose_grid):
+                    child_node.h = h_estimation(child_node.left_leg,child_node.right_leg,child_node.left_arm,child_node.right_arm,or_robot,torso_pose_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal)
 
                     child_serial = child_node.get_serial()
 
@@ -718,8 +719,8 @@ def branching(current,goal,step_transition_model,hand_transition_model,structure
                                 print(child_node.right_arm)
                                 print(temp_node.h)
                                 print(child_node.h)
-                                print(h_estimation(temp_node.left_leg,temp_node.right_leg,temp_node.left_arm,temp_node.right_arm,or_robot,dh_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal))
-                                print(h_estimation(child_node.left_leg,child_node.right_leg,child_node.left_arm,child_node.right_arm,or_robot,dh_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal))
+                                print(h_estimation(temp_node.left_leg,temp_node.right_leg,temp_node.left_arm,temp_node.right_arm,or_robot,torso_pose_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal))
+                                print(h_estimation(child_node.left_leg,child_node.right_leg,child_node.left_arm,child_node.right_arm,or_robot,torso_pose_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal))
                                 IPython.embed()
                     else:
                         if child_node.g + child_node.h < G:
@@ -826,19 +827,19 @@ def branching(current,goal,step_transition_model,hand_transition_model,structure
 
                 if (link_no == 2 and
                     (new_left_arm == current_left_arm or
-                    new_left_arm[0] >= dh_grid.max_x or
-                    new_left_arm[0] < dh_grid.min_x or
-                    new_left_arm[1] >= dh_grid.max_y or
-                    new_left_arm[1] < dh_grid.min_y) and
+                    new_left_arm[0] >= torso_pose_grid.max_x or
+                    new_left_arm[0] < torso_pose_grid.min_x or
+                    new_left_arm[1] >= torso_pose_grid.max_y or
+                    new_left_arm[1] < torso_pose_grid.min_y) and
                     new_left_arm[0] != -99.0):
                     continue
 
                 if (link_no == 3 and
                     (new_right_arm == current_right_arm or
-                    new_right_arm[0] >= dh_grid.max_x or
-                    new_right_arm[0] < dh_grid.min_x or
-                    new_right_arm[1] >= dh_grid.max_y or
-                    new_right_arm[1] < dh_grid.min_y) and
+                    new_right_arm[0] >= torso_pose_grid.max_x or
+                    new_right_arm[0] < torso_pose_grid.min_x or
+                    new_right_arm[1] >= torso_pose_grid.max_y or
+                    new_right_arm[1] < torso_pose_grid.min_y) and
                     new_right_arm[0] != -99.0):
                     continue
 
@@ -873,7 +874,7 @@ def branching(current,goal,step_transition_model,hand_transition_model,structure
 
                 child_node.g = child_node.g + hand_body_cost_ratio * edge_cost
                 child_node.edge_cost = hand_body_cost_ratio * edge_cost
-                child_node.h = h_estimation(child_node.left_leg,child_node.right_leg,child_node.left_arm,child_node.right_arm,or_robot,dh_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal)
+                child_node.h = h_estimation(child_node.left_leg,child_node.right_leg,child_node.left_arm,child_node.right_arm,or_robot,torso_pose_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal)
 
                 if temp_node is not None:
                     if temp_node.explore_state != 'CLOSED':
@@ -907,8 +908,8 @@ def branching(current,goal,step_transition_model,hand_transition_model,structure
                             print(child_node.right_arm)
                             print(temp_node.h)
                             print(child_node.h)
-                            print(h_estimation(temp_node.left_leg,temp_node.right_leg,temp_node.left_arm,temp_node.right_arm,or_robot,dh_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal))
-                            print(h_estimation(child_node.left_leg,child_node.right_leg,child_node.left_arm,child_node.right_arm,or_robot,dh_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal))
+                            print(h_estimation(temp_node.left_leg,temp_node.right_leg,temp_node.left_arm,temp_node.right_arm,or_robot,torso_pose_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal))
+                            print(h_estimation(child_node.left_leg,child_node.right_leg,child_node.left_arm,child_node.right_arm,or_robot,torso_pose_grid,motion_mode=motion_modes[0],heuristics=heuristics,exact_goal_pose=exact_goal_pose,goal=goal))
                             IPython.embed()
                 else:
                     if child_node.g + child_node.h < G:
@@ -927,14 +928,14 @@ def retracePath(n):
     path.reverse()
     return path
 
-def ANA_Star(general_ik_interface,or_robot,structures,dh_grid,goal,initial_node=None,
+def ANA_Star(general_ik_interface,or_robot,structures,torso_pose_grid,goal,initial_node=None,
              step_transition_model=None,hand_transition_model=None,
              motion_mode=0,other_motion_modes=None,heuristics='dijkstra',
              exact_goal_pose=None,goal_radius=goal_br,
              preferred_planning_time=ANA_planning_time,
              planning_time_limit=ANA_time_limit,
              skip_state_feasibility_test=False,
-             multiple_motion_modes=False,
+             multiple_motion_modes=False,collect_training_data=False,
              initial_G_h_ratio=999.0):
 
     env = or_robot.env
@@ -983,7 +984,10 @@ def ANA_Star(general_ik_interface,or_robot,structures,dh_grid,goal,initial_node=
     initial_node.left_arm_moved = False
     initial_node.right_arm_moved = False
 
-    G = initial_node.h * initial_G_h_ratio
+    if collect_training_data:
+        G = sys.float_info.max
+    else:
+        G = initial_node.h * initial_G_h_ratio
     E = G
 
     start_x = (initial_node.left_leg[0] + initial_node.right_leg[0])/2.0;
@@ -1005,7 +1009,7 @@ def ANA_Star(general_ik_interface,or_robot,structures,dh_grid,goal,initial_node=
     while openHeap:
         while openHeap:
 
-            if time.time() - ANA_starting_time > planning_time_limit and not path:
+            if planning_time_limit >= 0 and time.time() - ANA_starting_time > planning_time_limit and not path:
                 print('A* Planning Time Out!')
                 return []
 
@@ -1094,7 +1098,6 @@ def ANA_Star(general_ik_interface,or_robot,structures,dh_grid,goal,initial_node=
                     if exact_goal_pose is None or current != goal_node:
                         current.explore_state = 'CLOSED'
                         NodeDict[current_serial] = current
-
                     continue
 
                 current.explore_state = 'EXPLORED'
@@ -1114,36 +1117,55 @@ def ANA_Star(general_ik_interface,or_robot,structures,dh_grid,goal,initial_node=
                 current_virtual_body_yaw = current.get_virtual_body_yaw()
                 theta_error = math.acos(math.cos((current_virtual_body_yaw-goal_theta)*deg_to_rad)) * rad_to_deg
 
-                if ((exact_goal_pose is None and body_euclid_dist_to_goal <= goal_radius and theta_error <= 30) or
-                    (exact_goal_pose is not None and current.at_exact_pose(exact_goal_pose))):
+                if collect_training_data:
+                    goal_reached = (abs(current_mean_leg_x-goal_x) <= torso_pose_grid.resolution/2.0 and
+                                    abs(current_mean_leg_y-goal_y) <= torso_pose_grid.resolution/2.0 and
+                                    ((motion_mode == 0 and current.left_arm[0] != -99.0 and current.right_arm[0] != -99.0) or
+                                     (motion_mode == 1 and current.left_arm[0] != -99.0) or
+                                     (motion_mode == 2 and current.right_arm[0] != -99.0) or
+                                     motion_mode == 3))
+                else:
+                    goal_reached = ((exact_goal_pose is None and body_euclid_dist_to_goal <= goal_radius and theta_error <= 30) or
+                                    (exact_goal_pose is not None and current.at_exact_pose(exact_goal_pose)))
+
+                if goal_reached:
 
                     G = current.g
 
                     handles = []
                     DrawStances(current,or_robot,env,handles)
                     path = retracePath(current)
-                    print('T = %5.3f, Path found. E: %5.5f, G: %5.5f, # of Steps: %d, # of Nodes Explored: %d'%(time.time() - ANA_starting_time,E,G,len(path),explored_node_num))
+                    if collect_training_data:
+                        print('T = %5.3f, Path found.'%(time.time() - ANA_starting_time))
+                    else:
+                        print('T = %5.3f, Path found. E: %5.5f, G: %5.5f, # of Steps: %d, # of Nodes Explored: %d'%(time.time() - ANA_starting_time,E,G,len(path),explored_node_num))
 
                     NodeDict[current_serial] = current
 
                     break
 
-                if other_motion_modes is None:
-                    motion_modes = [motion_mode]
-                else:
-                    body_euclid_dist_to_start = math.sqrt((start_x-current_mean_leg_x)**2 + (start_y-current_mean_leg_y)**2)
-                    if body_euclid_dist_to_start <= goal_radius:
-                        motion_modes = [motion_mode] + other_motion_modes + [0,1,2,3]
-                    else:
+                # Only branch one step in foot motion when collecting training data
+                if not collect_training_data or (current.left_leg == initial_node.left_leg and current.right_leg == initial_node.right_leg):
+
+                    # Determine the motion mode to use
+                    if other_motion_modes is None:
                         motion_modes = [motion_mode]
+                    else:
+                        body_euclid_dist_to_start = math.sqrt((start_x-current_mean_leg_x)**2 + (start_y-current_mean_leg_y)**2)
+                        if body_euclid_dist_to_start <= goal_radius:
+                            motion_modes = [motion_mode] + other_motion_modes + [0,1,2,3]
+                        else:
+                            motion_modes = [motion_mode]
 
-                    if multiple_motion_modes:
-                        motion_modes = [motion_mode] + other_motion_modes[1:]
+                        if multiple_motion_modes:
+                            motion_modes = [motion_mode] + other_motion_modes[1:]
 
-                if exact_goal_pose and body_euclid_dist_to_goal <= 2.0 * goal_radius:
-                    motion_modes.append(next_motion_mode)
+                    if exact_goal_pose and body_euclid_dist_to_goal <= 2.0 * goal_radius:
+                        motion_modes.append(next_motion_mode)
 
-                branching(current,goal,step_transition_model,hand_transition_model,structures,structures_dict,or_robot,NodeDict,openHeap,G,dh_grid,exact_goal_pose,motion_modes=motion_modes,heuristics=heuristics,goal_node=goal_node)
+                    # Find all the branches from the current node
+                    branching(current,goal,step_transition_model,hand_transition_model,structures,structures_dict,or_robot,NodeDict,openHeap,G,torso_pose_grid,exact_goal_pose,motion_modes=motion_modes,heuristics=heuristics,goal_node=goal_node)
+
                 NodeDict[current_serial] = current
 
 

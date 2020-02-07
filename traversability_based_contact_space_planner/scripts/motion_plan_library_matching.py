@@ -259,7 +259,7 @@ def fitting_env_and_get_plan_cost(or_robot,contact_sequence,contact_regions,q_se
 
 
 def plan_env_matching(or_robot,contact_points,contact_regions,
-                      dh_grid,start,goal,torso_path,structures,
+                      torso_pose_grid,start,goal,torso_path,structures,
                       motion_mode,
                       motion_plan_library,
                       motion_plan_clusters,
@@ -284,14 +284,14 @@ def plan_env_matching(or_robot,contact_points,contact_regions,
 
     goal_x = goal[0]
     goal_y = goal[1]
-    goal_z = dh_grid.get_cell_height(dh_grid.position_to_grid_xy((goal_x,goal_y)))
+    goal_z = torso_pose_grid.get_cell_height(torso_pose_grid.position_to_grid_xy((goal_x,goal_y)))
     if goal_z < -0.05:
         goal_z = 0
     goal_theta = goal[2]
 
     start_x = start[0]
     start_y = start[1]
-    start_z = dh_grid.get_cell_height(dh_grid.position_to_grid_xy((start_x,start_y)))
+    start_z = torso_pose_grid.get_cell_height(torso_pose_grid.position_to_grid_xy((start_x,start_y)))
     if start_z < -0.05:
         start_z = 0
     start_theta = start[2]
@@ -423,14 +423,14 @@ def plan_env_matching(or_robot,contact_points,contact_regions,
 
             subsegment_goal_x = subsegment_goal[0]
             subsegment_goal_y = subsegment_goal[1]
-            subsegment_goal_z = dh_grid.get_cell_height(dh_grid.position_to_grid_xy((subsegment_goal_x,subsegment_goal_y)))
+            subsegment_goal_z = torso_pose_grid.get_cell_height(torso_pose_grid.position_to_grid_xy((subsegment_goal_x,subsegment_goal_y)))
             if subsegment_goal_z < -0.05:
                 subsegment_goal_z = 0
             subsegment_goal_theta = subsegment_goal[2]
 
             subsegment_start_x = subsegment_start[0]
             subsegment_start_y = subsegment_start[1]
-            subsegment_start_z = dh_grid.get_cell_height(dh_grid.position_to_grid_xy((subsegment_start_x,subsegment_start_y)))
+            subsegment_start_z = torso_pose_grid.get_cell_height(torso_pose_grid.position_to_grid_xy((subsegment_start_x,subsegment_start_y)))
             if subsegment_start_z < -0.05:
                 subsegment_start_z = 0
             subsegment_start_theta = subsegment_start[2]

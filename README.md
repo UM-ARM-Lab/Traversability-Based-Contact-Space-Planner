@@ -58,7 +58,7 @@ The contact planner is initiated with the script `humanoid_motion_planner.py` wi
 
 * `surface_source`: The source of the environment in planning. The repo provides 3 examples each for two-corridor and two-stair environment. The user can create new environment by adding new options in `update_environment` function in `environment_handler.py`.<br/>
   `two_corridor_environment`(Default): Randomly generate a two-corridor environment.<br/>
-  `two_stair_environment`: Randomly generate a two-corridor environment.<br/>
+  `two_stair_environment`: Randomly generate a two-stair environment.<br/>
   `load_from_data`: Load environment object file stored using `pickle` from path specified by `environment_path` parameter.
 
 * `environment_path`: The folder which contains the stored environment object file.

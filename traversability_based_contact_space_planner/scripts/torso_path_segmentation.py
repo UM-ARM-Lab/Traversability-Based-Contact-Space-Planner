@@ -9,7 +9,7 @@ from config_parameter import *
 from transformation_conversion import *
 
 
-def get_torso_path_segment_traversability(dh_grid, torso_path_segment, motion_type):
+def get_torso_path_segment_traversability(torso_pose_grid, torso_path_segment, motion_type):
 
     min_traversability = 9999.0
     for i in range(len(torso_path_segment)):
@@ -20,16 +20,16 @@ def get_torso_path_segment_traversability(dh_grid, torso_path_segment, motion_ty
             (ix1,iy1,itheta1) = cell1.get_indices()
             (ix2,iy2,itheta2) = cell2.get_indices()
 
-            traversability = dh_grid.env_transition_all_motion_mode_prediction_dict[(ix1,iy1,itheta1,ix2,iy2)][motion_type]
+            traversability = torso_pose_grid.env_transition_all_motion_mode_prediction_dict[(ix1,iy1,itheta1,ix2,iy2)][motion_type]
 
             if traversability < min_traversability:
                 min_traversability = traversability
 
     return min_traversability
 
-def get_torso_path_segment_score(dh_grid,torso_path_segment,motion_mode,traversability_threshold=0.3):
+def get_torso_path_segment_score(torso_pose_grid,torso_path_segment,motion_mode,traversability_threshold=0.3):
 
-    mean_torso_path_score = get_torso_path_segment_traversability_score_mean(dh_grid,torso_path_segment,motion_mode)
+    mean_torso_path_score = get_torso_path_segment_traversability_score_mean(torso_pose_grid,torso_path_segment,motion_mode)
 
     transition_num = len(torso_path_segment)-1
 
@@ -37,7 +37,7 @@ def get_torso_path_segment_score(dh_grid,torso_path_segment,motion_mode,traversa
 
     return score
 
-def get_torso_path_segment_traversability_score_step_diff(dh_grid,torso_path_segment,motion_mode,using_library=False):
+def get_torso_path_segment_traversability_score_step_diff(torso_pose_grid,torso_path_segment,motion_mode,using_library=False):
     traversability_cost_list = [0.0] * (len(torso_path_segment)-1)
 
     score = 0.0
@@ -51,7 +51,7 @@ def get_torso_path_segment_traversability_score_step_diff(dh_grid,torso_path_seg
             (ix2,iy2,itheta2) = cell2.get_indices()
 
             if ix1 != ix2 or iy1 != iy2:
-                env_transition_predict = dh_grid.env_transition_all_motion_mode_prediction_dict[(ix1,iy1,itheta1,ix2,iy2)][motion_mode]
+                env_transition_predict = torso_pose_grid.env_transition_all_motion_mode_prediction_dict[(ix1,iy1,itheta1,ix2,iy2)][motion_mode]
                 env_transition_cost = math.exp(-env_transition_predict)
             else:
                 env_transition_cost = 0
@@ -65,7 +65,7 @@ def get_torso_path_segment_traversability_score_step_diff(dh_grid,torso_path_seg
 
     return score
 
-def get_torso_path_segment_traversability_score_mean(dh_grid,torso_path_segment,motion_mode):
+def get_torso_path_segment_traversability_score_mean(torso_pose_grid,torso_path_segment,motion_mode):
     traversability_cost_list = [0.0] * (len(torso_path_segment)-1)
 
     for i in range(len(torso_path_segment)):
@@ -77,7 +77,7 @@ def get_torso_path_segment_traversability_score_mean(dh_grid,torso_path_segment,
             (ix2,iy2,itheta2) = cell2.get_indices()
 
             if ix1 != ix2 or iy1 != iy2:
-                env_transition_predict = dh_grid.env_transition_all_motion_mode_prediction_dict[(ix1,iy1,itheta1,ix2,iy2)][motion_mode]
+                env_transition_predict = torso_pose_grid.env_transition_all_motion_mode_prediction_dict[(ix1,iy1,itheta1,ix2,iy2)][motion_mode]
                 env_transition_cost = math.exp(-env_transition_predict)
             else:
                 env_transition_cost = 0
@@ -86,7 +86,7 @@ def get_torso_path_segment_traversability_score_mean(dh_grid,torso_path_segment,
 
     return np.mean(traversability_cost_list)
 
-def get_torso_path_segment_traversability_score_max(dh_grid,torso_path_segment,motion_mode):
+def get_torso_path_segment_traversability_score_max(torso_pose_grid,torso_path_segment,motion_mode):
     traversability_cost_list = [0.0] * (len(torso_path_segment)-1)
 
     for i in range(len(torso_path_segment)):
@@ -98,7 +98,7 @@ def get_torso_path_segment_traversability_score_max(dh_grid,torso_path_segment,m
             (ix2,iy2,itheta2) = cell2.get_indices()
 
             if ix1 != ix2 or iy1 != iy2:
-                env_transition_predict = dh_grid.env_transition_all_motion_mode_prediction_dict[(ix1,iy1,itheta1,ix2,iy2)][motion_mode]
+                env_transition_predict = torso_pose_grid.env_transition_all_motion_mode_prediction_dict[(ix1,iy1,itheta1,ix2,iy2)][motion_mode]
                 env_transition_cost = math.exp(-env_transition_predict)
             else:
                 env_transition_cost = 0
@@ -107,7 +107,7 @@ def get_torso_path_segment_traversability_score_max(dh_grid,torso_path_segment,m
 
     return np.max(traversability_cost_list)
 
-def get_torso_path_segment_length(dh_grid,torso_path_segment):
+def get_torso_path_segment_length(torso_pose_grid,torso_path_segment):
     length = 0.0
 
     for i in range(len(torso_path_segment)):
@@ -122,7 +122,7 @@ def get_torso_path_segment_length(dh_grid,torso_path_segment):
 
     return length
 
-def get_segmentation_score(dh_grid,torso_path,segmentation,traversability_threshold=0.3):
+def get_segmentation_score(torso_pose_grid,torso_path,segmentation,traversability_threshold=0.3):
 
     score = 0.0
 
@@ -132,14 +132,14 @@ def get_segmentation_score(dh_grid,torso_path,segmentation,traversability_thresh
         motion_mode = segment[2]
 
         torso_path_segment = torso_path[start_index:end_index+1]
-        segment_score = get_torso_path_segment_score(dh_grid,torso_path_segment,motion_mode,traversability_threshold)
+        segment_score = get_torso_path_segment_score(torso_pose_grid,torso_path_segment,motion_mode,traversability_threshold)
 
 
         score += abs(segment_score)
 
     return round(score,5)
 
-def exhaustive_search_segmentations(dh_grid,torso_path,motion_mode,traversability_threshold=0.3):
+def exhaustive_search_segmentations(torso_pose_grid,torso_path,motion_mode,traversability_threshold=0.3):
     segmentation_list = []
 
     torso_path_len = len(torso_path)
@@ -184,7 +184,7 @@ def exhaustive_search_segmentations(dh_grid,torso_path,motion_mode,traversabilit
                 segmentation_list.append(segmentation)
 
 
-                segmentation_score = get_segmentation_score(dh_grid,torso_path,segmentation,traversability_threshold)
+                segmentation_score = get_segmentation_score(torso_pose_grid,torso_path,segmentation,traversability_threshold)
 
                 normalized_segmentation_num = float(len(segmentation))/max_segment_num
 
@@ -198,7 +198,7 @@ def exhaustive_search_segmentations(dh_grid,torso_path,motion_mode,traversabilit
         segmentation = [(0,len(torso_path)-1,motion_mode)]
         segmentation_list = [segmentation]
 
-        segmentation_score = get_segmentation_score(dh_grid,torso_path,segmentation,traversability_threshold)
+        segmentation_score = get_segmentation_score(torso_pose_grid,torso_path,segmentation,traversability_threshold)
         normalized_segmentation_num = float(len(segmentation))/max_segment_num
         segmentation_data_points_list.append((segmentation,normalized_segmentation_num,segmentation_score))
         optimal_segmentation = (segmentation,normalized_segmentation_num,segmentation_score)
@@ -207,7 +207,7 @@ def exhaustive_search_segmentations(dh_grid,torso_path,motion_mode,traversabilit
     return optimal_segmentation
 
 
-def get_torso_path_segmentation(dh_grid,torso_path,path_segmentation_type='motion_mode_and_traversability_segmentation',traversability_threshold=0.3):
+def get_torso_path_segmentation(torso_pose_grid,torso_path,path_segmentation_type='motion_mode_and_traversability_segmentation',traversability_threshold=0.3):
 
     if path_segmentation_type == 'random':
         cut_point_num = len(torso_path)-2
@@ -225,7 +225,7 @@ def get_torso_path_segmentation(dh_grid,torso_path,path_segmentation_type='motio
                 segmentation.append((segment_start,segment_end,random.choice([0,1,2,3])))
                 segment_start = segment_end
 
-        segmentation_score = get_segmentation_score(dh_grid,torso_path,segmentation)
+        segmentation_score = get_segmentation_score(torso_pose_grid,torso_path,segmentation)
         normalized_segmentation_num = float(len(segmentation))/max_segment_num
 
         path_segmentation = (segmentation,normalized_segmentation_num,segmentation_score)
@@ -292,14 +292,14 @@ def get_torso_path_segmentation(dh_grid,torso_path,path_segmentation_type='motio
                     (ix1,iy1,itheta1) = torso_path[i-1].get_indices()
 
                     if ix1 != ix2 or iy1 != iy2:
-                        env_transition_predict = dh_grid.env_transition_all_motion_mode_prediction_dict[(ix1,iy1,itheta1,ix2,iy2)][motion_mode]
+                        env_transition_predict = torso_pose_grid.env_transition_all_motion_mode_prediction_dict[(ix1,iy1,itheta1,ix2,iy2)][motion_mode]
                         env_transition_cost = math.exp(-env_transition_predict)
                     else:
                         env_transition_cost = 0
 
                     env_transition_cost_list.append(env_transition_cost)
 
-            path_subsegment_list,_,_ = exhaustive_search_segmentations(dh_grid,torso_path[start_index:end_index+1],motion_mode,traversability_threshold)
+            path_subsegment_list,_,_ = exhaustive_search_segmentations(torso_pose_grid,torso_path[start_index:end_index+1],motion_mode,traversability_threshold)
 
             for path_subsegment in path_subsegment_list:
                 path_segment_list.append((path_subsegment[0]+start_index,path_subsegment[1]+start_index,motion_mode))

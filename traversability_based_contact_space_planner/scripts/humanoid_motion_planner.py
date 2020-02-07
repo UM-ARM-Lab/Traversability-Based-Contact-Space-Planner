@@ -385,19 +385,19 @@ def main(contact_sequence_generation_method='all_planning',
                 planning_time_limit = 500.0
 
             # initialize the map grid
-            dh_grid = map_grid(map_grid_resolution, structures, or_robot)
+            torso_pose_grid = map_grid(map_grid_resolution, structures, or_robot)
 
             # draw the goal
-            (goal_nx,goal_ny,goal_ntheta) = dh_grid.position_to_grid((goal_x,goal_y,goal_theta))
-            DrawRegion(or_robot.env, xyzrpy_to_SE3([goal_x,goal_y,dh_grid.cell_2D_list[goal_nx][goal_ny].height+0.02,0,0,goal_theta]), goal_br)
+            (goal_nx,goal_ny,goal_ntheta) = torso_pose_grid.position_to_grid((goal_x,goal_y,goal_theta))
+            DrawRegion(or_robot.env, xyzrpy_to_SE3([goal_x,goal_y,torso_pose_grid.cell_2D_list[goal_nx][goal_ny].height+0.02,0,0,goal_theta]), goal_br)
 
-            dh_grid_construction_time = time.time() - start_time ##! time used to construct the dh_grid
+            torso_pose_grid_construction_time = time.time() - start_time ##! time used to construct the torso_pose_grid
             last_time_stamp = time.time()
 
 
             start_cpp_feature_vector_calculation = time.time()
 
-            all_torso_transition = dh_grid.get_all_torso_transition()
+            all_torso_transition = torso_pose_grid.get_all_torso_transition()
 
             get_all_torso_transition = time.time()
 
@@ -407,12 +407,12 @@ def main(contact_sequence_generation_method='all_planning',
                                                                 footstep_windows,
                                                                 all_torso_transition,# env_transition_checking_cells_cpp,
                                                                 foot_contact_point_resolution,
-                                                                dh_grid,
+                                                                torso_pose_grid,
                                                                 hand_transition_model)
 
             end_cpp_feature_vector_calculation = time.time()
 
-            dh_grid.update_traversability_features(footstep_transition_traversability_legs_only,footstep_transition_traversability,hand_transition_traversability)
+            torso_pose_grid.update_traversability_features(footstep_transition_traversability_legs_only,footstep_transition_traversability,hand_transition_traversability)
 
             end_copying_result = time.time()
 
@@ -426,9 +426,9 @@ def main(contact_sequence_generation_method='all_planning',
 
             start_copy_time = time.time()
 
-            dh_grid_original = copy.deepcopy(dh_grid)
+            torso_pose_grid_original = copy.deepcopy(torso_pose_grid)
 
-            dh_grid_copy_time = time.time() - start_copy_time
+            torso_pose_grid_copy_time = time.time() - start_copy_time
             last_time_stamp = time.time()
 
             #######################################################################
@@ -436,7 +436,7 @@ def main(contact_sequence_generation_method='all_planning',
             # Dijkstra path planning to get the torso policy
 
             start_dh_planning = time.time()
-            torso_path = dh_grid.path_planning(goal,start=(0,0,0),method='A_Star',direction='backward',exhaust_the_map=False,env_transition_bias=True,consider_motion_mode=True)
+            torso_path = torso_pose_grid.path_planning(goal,start=(0,0,0),method='A_Star',direction='backward',exhaust_the_map=False,env_transition_bias=True,consider_motion_mode=True)
             dijkstra_map_constructed = torso_path
             end_dh_planning = time.time()
 
@@ -454,7 +454,7 @@ def main(contact_sequence_generation_method='all_planning',
             rave.raveLogInfo('Find the torso path segmentation.')
 
             ##### Work on get_torso_path_segment if we want to further decompose this path to smaller segments #####
-            torso_path_segmentation = get_torso_path_segmentation(dh_grid,
+            torso_path_segmentation = get_torso_path_segmentation(torso_pose_grid,
                                                                   torso_path,
                                                                   path_segmentation_type=path_segmentation_type,
                                                                   traversability_threshold=traversability_threshold)
@@ -469,7 +469,6 @@ def main(contact_sequence_generation_method='all_planning',
             total_init_manipulation_objects_configuration = None
             total_init_manipulating_objects = None
             total_initial_node = node(total_init_left_leg,total_init_right_leg,total_init_left_arm,total_init_right_arm,0,0,None,None)
-            total_initial_node.dr_ability = 1.0
 
             #######################################################################
             rave.raveLogInfo('Start to Generate the Path.')
@@ -498,11 +497,11 @@ def main(contact_sequence_generation_method='all_planning',
 
                 elif contact_sequence_generation_method == 'hybrid':
                     new_torso_segment = torso_path[torso_path_segment_indices[0]:torso_path_segment_indices[1]+1]
-                    segment_traversability_score_mean = get_torso_path_segment_traversability_score_mean(dh_grid,
+                    segment_traversability_score_mean = get_torso_path_segment_traversability_score_mean(torso_pose_grid,
                                                                                                         new_torso_segment,
                                                                                                         torso_path_segment_motion_mode)
 
-                    segment_traversability_score_max = get_torso_path_segment_traversability_score_max(dh_grid,
+                    segment_traversability_score_max = get_torso_path_segment_traversability_score_max(torso_pose_grid,
                                                                                                     new_torso_segment,
                                                                                                     torso_path_segment_motion_mode)
 
@@ -526,14 +525,14 @@ def main(contact_sequence_generation_method='all_planning',
                 for i in range(torso_path_segment_indices[0],torso_path_segment_indices[1]+1):
                     if i != torso_path_segment_indices[0]:
                         if path_segmentation_type == 'no_segmentation':
-                            DrawGridPath([torso_path[i].get_position(),torso_path[i-1].get_position()], env, dh_grid,
+                            DrawGridPath([torso_path[i].get_position(),torso_path[i-1].get_position()], env, torso_pose_grid,
                                           [0,0,0],z=1.4,style='single')
                         else:
                             if new_path_segment.path_generation_method  == 'planning':
-                                DrawGridPath([torso_path[i].get_position(),torso_path[i-1].get_position()], env, dh_grid,
+                                DrawGridPath([torso_path[i].get_position(),torso_path[i-1].get_position()], env, torso_pose_grid,
                                             motion_mode_color_dict[torso_path_segment_motion_mode],z=1.4,style='single')
                             elif new_path_segment.path_generation_method  == 'retrieval':
-                                DrawGridPath([torso_path[i].get_position(),torso_path[i-1].get_position()], env, dh_grid,
+                                DrawGridPath([torso_path[i].get_position(),torso_path[i-1].get_position()], env, torso_pose_grid,
                                             motion_mode_color_dict[torso_path_segment_motion_mode],z=1.4,style='single')
 
                 # DrawPoint(env,(torso_path[torso_path_segment_indices[1]].get_position()[0],torso_path[torso_path_segment_indices[1]].get_position()[1],0.2),rgb=[193.0/255.0,50.0/255.0,142.0/255.0,0.8],size=0.2)
@@ -598,7 +597,7 @@ def main(contact_sequence_generation_method='all_planning',
 
                 num_segments = len(path_segments)
 
-                if planning_time_limit is not None and start_time+planning_time_limit-dh_grid_copy_time-time.time() < 0:
+                if planning_time_limit is not None and start_time+planning_time_limit-torso_pose_grid_copy_time-time.time() < 0:
                     rave.raveLogError('Time Out!')
                     planning_healthy = False
                     break
@@ -608,7 +607,7 @@ def main(contact_sequence_generation_method='all_planning',
 
                 for segment_index in segment_explore_sequence:
 
-                    if planning_time_limit is not None and start_time+planning_time_limit-dh_grid_copy_time-time.time() < 0:
+                    if planning_time_limit is not None and start_time+planning_time_limit-torso_pose_grid_copy_time-time.time() < 0:
                         planning_healthy = False
                         break
 
@@ -641,10 +640,10 @@ def main(contact_sequence_generation_method='all_planning',
 
                         rave.raveLogInfo('Now Start Matching Motion Plan to Segment %d.'%(segment_index))
 
-                        dh_grid_segment_goal = dh_grid_original
-                        torso_path_segment_neighbor_indices = dh_grid_segment_goal.get_neighbor_cell_indices(torso_path_segment)
+                        torso_pose_grid_segment_goal = torso_pose_grid_original
+                        torso_path_segment_neighbor_indices = torso_pose_grid_segment_goal.get_neighbor_cell_indices(torso_path_segment)
 
-                        local_torso_path_segment = dh_grid_segment_goal.path_planning(segment_goal,start=segment_start,method='A_Star',direction='backward',exhaust_the_map=False,search_space=torso_path_segment_neighbor_indices)
+                        local_torso_path_segment = torso_pose_grid_segment_goal.path_planning(segment_goal,start=segment_start,method='A_Star',direction='backward',exhaust_the_map=False,search_space=torso_path_segment_neighbor_indices)
 
                         motion_plan_library_mm = motion_plan_library_list[motion_mode]
                         motion_plan_clusters_mm = motion_plan_clusters_list[motion_mode]
@@ -653,7 +652,7 @@ def main(contact_sequence_generation_method='all_planning',
                         matching_result = plan_env_matching(or_robot,
                                                             contact_points,
                                                             contact_regions,
-                                                            dh_grid,
+                                                            torso_pose_grid,
                                                             segment_start,
                                                             segment_goal,
                                                             local_torso_path_segment, #torso_path_segment
@@ -662,11 +661,11 @@ def main(contact_sequence_generation_method='all_planning',
                                                             motion_plan_library=motion_plan_library_mm,
                                                             motion_plan_clusters=motion_plan_clusters_mm,
                                                             motion_plan_explore_order=motion_plan_explore_order_mm,
-                                                            planning_time_limit=start_time+planning_time_limit-dh_grid_copy_time-time.time(),
+                                                            planning_time_limit=start_time+planning_time_limit-torso_pose_grid_copy_time-time.time(),
                                                             elasticstrips=elasticstrips,
                                                             general_ik_interface=general_ik_interface)
 
-                        dh_grid_segment_goal.reset_cells_cost()
+                        torso_pose_grid_segment_goal.reset_cells_cost()
 
                         if matching_result is None:
                             rave.raveLogWarn('No Matching Motion Plan, Switch to Planning and Reorder the Segments Exploration Sequence.')
@@ -723,9 +722,9 @@ def main(contact_sequence_generation_method='all_planning',
 
                         # Planning
                         rave.raveLogInfo('Constructing segment goal Dijkstra map...')
-                        dh_grid_segment_goal = dh_grid_original
-                        torso_path_segment_neighbor_indices = dh_grid_segment_goal.get_neighbor_cell_indices(torso_path_segment)
-                        # DrawCells(env, torso_path_segment_neighbor_indices, dh_grid_segment_goal)
+                        torso_pose_grid_segment_goal = torso_pose_grid_original
+                        torso_path_segment_neighbor_indices = torso_pose_grid_segment_goal.get_neighbor_cell_indices(torso_path_segment)
+                        # DrawCells(env, torso_path_segment_neighbor_indices, torso_pose_grid_segment_goal)
 
                         rave.raveLogInfo('Now Start Planning...')
                         planning_starting_time = time.time()
@@ -751,7 +750,7 @@ def main(contact_sequence_generation_method='all_planning',
 
                         # final segment or the next segment is also using planning
                         if segment_index == (num_segments-1) or next_segment.contact_state_path is None:
-                            dijkstra_map_constructed = dh_grid_segment_goal.path_planning(segment_goal,start=None,method='Dijkstra',direction='backward',exhaust_the_map=True,search_space=torso_path_segment_neighbor_indices)
+                            dijkstra_map_constructed = torso_pose_grid_segment_goal.path_planning(segment_goal,start=None,method='Dijkstra',direction='backward',exhaust_the_map=True,search_space=torso_path_segment_neighbor_indices)
                             # DrawRegion(or_robot.env,xyzrpy_to_SE3([segment_goal[0],segment_goal[1],0.1,0,0,segment_goal[2]]),goal_br)
 
                             initial_node.h = h_estimation(initial_node.left_leg,
@@ -759,13 +758,13 @@ def main(contact_sequence_generation_method='all_planning',
                                                           initial_node.left_arm,
                                                           initial_node.right_arm,
                                                           or_robot,
-                                                          dh_grid_segment_goal,
+                                                          torso_pose_grid_segment_goal,
                                                           goal=segment_goal,
                                                           motion_mode=motion_mode,
                                                           heuristics='dijkstra')
 
                             if recording_data:
-                                segment_path = ANA_Star(general_ik_interface, or_robot, structures, dh_grid_segment_goal,
+                                segment_path = ANA_Star(general_ik_interface, or_robot, structures, torso_pose_grid_segment_goal,
                                                         goal=segment_goal, initial_node=initial_node,
                                                         step_transition_model=step_transition_model,
                                                         hand_transition_model=hand_transition_model,
@@ -777,7 +776,7 @@ def main(contact_sequence_generation_method='all_planning',
                                                         preferred_planning_time=min(ANA_time_limit-1.0,len(torso_path_segment)*5.0))
                             else:
                                 if path_segmentation_type == 'no_segmentation':
-                                    segment_path = ANA_Star(general_ik_interface, or_robot, structures, dh_grid_segment_goal,
+                                    segment_path = ANA_Star(general_ik_interface, or_robot, structures, torso_pose_grid_segment_goal,
                                                             goal=segment_goal, initial_node=initial_node,
                                                             step_transition_model=step_transition_model,
                                                             hand_transition_model=hand_transition_model,
@@ -785,13 +784,13 @@ def main(contact_sequence_generation_method='all_planning',
                                                             other_motion_modes=[3,0,1,2],
                                                             heuristics='dijkstra',
                                                             goal_radius=goal_br,
-                                                            planning_time_limit=start_time+planning_time_limit-dh_grid_copy_time-time.time(),
+                                                            planning_time_limit=start_time+planning_time_limit-torso_pose_grid_copy_time-time.time(),
                                                             multiple_motion_modes=True)
                                 else:
 
                                     other_motion_modes = [last_motion_mode]
 
-                                    segment_path = ANA_Star(general_ik_interface, or_robot, structures, dh_grid_segment_goal,
+                                    segment_path = ANA_Star(general_ik_interface, or_robot, structures, torso_pose_grid_segment_goal,
                                                             goal=segment_goal, initial_node=initial_node,
                                                             step_transition_model=step_transition_model,
                                                             hand_transition_model=hand_transition_model,
@@ -799,7 +798,7 @@ def main(contact_sequence_generation_method='all_planning',
                                                             other_motion_modes=other_motion_modes,
                                                             heuristics='dijkstra',
                                                             goal_radius=goal_br,
-                                                            planning_time_limit=start_time+planning_time_limit-dh_grid_copy_time-time.time())
+                                                            planning_time_limit=start_time+planning_time_limit-torso_pose_grid_copy_time-time.time())
 
                                     if not segment_path:
                                         death_cause += ('normal planning time out in segment %d;'%(segment_index))
@@ -812,7 +811,7 @@ def main(contact_sequence_generation_method='all_planning',
                             segment_goal_pose = segment_goal_node.get_mean_feet_xyzrpy()
                             tentative_segment_goal = [segment_goal_pose[0],segment_goal_pose[1],segment_goal_pose[5]] # try to set the goal to where the contact pose is at
 
-                            dijkstra_map_constructed = dh_grid_segment_goal.path_planning(tentative_segment_goal,start=None,method='Dijkstra',direction='backward',exhaust_the_map=True,search_space=torso_path_segment_neighbor_indices)
+                            dijkstra_map_constructed = torso_pose_grid_segment_goal.path_planning(tentative_segment_goal,start=None,method='Dijkstra',direction='backward',exhaust_the_map=True,search_space=torso_path_segment_neighbor_indices)
 
                             segment_goal = tentative_segment_goal
 
@@ -828,7 +827,7 @@ def main(contact_sequence_generation_method='all_planning',
                                                           initial_node.left_arm,
                                                           initial_node.right_arm,
                                                           or_robot,
-                                                          dh_grid_segment_goal,
+                                                          torso_pose_grid_segment_goal,
                                                           goal=segment_goal,
                                                           motion_mode=motion_mode,
                                                           heuristics=heuristics,
@@ -837,7 +836,7 @@ def main(contact_sequence_generation_method='all_planning',
                             other_motion_modes = [last_motion_mode]
 
                             if recording_data:
-                                segment_path = ANA_Star(general_ik_interface, or_robot, structures, dh_grid_segment_goal,
+                                segment_path = ANA_Star(general_ik_interface, or_robot, structures, torso_pose_grid_segment_goal,
                                                         goal=segment_goal, initial_node=initial_node,
                                                         step_transition_model=step_transition_model,
                                                         hand_transition_model=hand_transition_model,
@@ -845,10 +844,10 @@ def main(contact_sequence_generation_method='all_planning',
                                                         other_motion_modes=other_motion_modes,
                                                         heuristics=heuristics,
                                                         exact_goal_pose=goal_pose,
-                                                        planning_time_limit=ANA_time_limit,#planning_time_limit=start_time+planning_time_limit-dh_grid_copy_time-time.time())#,
+                                                        planning_time_limit=ANA_time_limit,#planning_time_limit=start_time+planning_time_limit-torso_pose_grid_copy_time-time.time())#,
                                                         preferred_planning_time=min(ANA_time_limit-1.0,len(torso_path_segment)*5.0))
                             else:
-                                segment_path = ANA_Star(general_ik_interface, or_robot, structures, dh_grid_segment_goal,
+                                segment_path = ANA_Star(general_ik_interface, or_robot, structures, torso_pose_grid_segment_goal,
                                                         goal=segment_goal, initial_node=initial_node,
                                                         step_transition_model=step_transition_model,
                                                         hand_transition_model=hand_transition_model,
@@ -856,14 +855,14 @@ def main(contact_sequence_generation_method='all_planning',
                                                         other_motion_modes=other_motion_modes,
                                                         heuristics=heuristics,
                                                         exact_goal_pose=goal_pose,
-                                                        planning_time_limit=start_time+planning_time_limit-dh_grid_copy_time-time.time())
+                                                        planning_time_limit=start_time+planning_time_limit-torso_pose_grid_copy_time-time.time())
 
                                 if not segment_path:
                                     death_cause += ('exact_goal_pose planning time out in segment %d;'%(segment_index))
 
                         planning_time = time.time() - planning_starting_time
 
-                        dh_grid_segment_goal.reset_cells_cost()
+                        torso_pose_grid_segment_goal.reset_cells_cost()
 
                         if len(segment_path) != 0:
                             rave.raveLogInfo('Planning Done. ANA* Planning Time: %5.5f'%(planning_time))
@@ -881,7 +880,7 @@ def main(contact_sequence_generation_method='all_planning',
 
 
                 if planning_healthy == False:
-                    if planning_time_limit is not None and start_time+planning_time_limit-dh_grid_copy_time-time.time() < 0:
+                    if planning_time_limit is not None and start_time+planning_time_limit-torso_pose_grid_copy_time-time.time() < 0:
                         rave.raveLogError('Time Out!')
                     break
 
@@ -936,13 +935,13 @@ def main(contact_sequence_generation_method='all_planning',
                                                       initial_node.left_arm,
                                                       initial_node.right_arm,
                                                       or_robot,
-                                                      dh_grid_original,
+                                                      torso_pose_grid_original,
                                                       goal=connection_goal,
                                                       motion_mode=segment.motion_mode,
                                                       heuristics='euclidean',
                                                       exact_goal_pose=connection_goal_pose)
 
-                        segment_path = ANA_Star(general_ik_interface, or_robot, structures, dh_grid_original,
+                        segment_path = ANA_Star(general_ik_interface, or_robot, structures, torso_pose_grid_original,
                                                 goal=connection_goal, initial_node=initial_node,
                                                 step_transition_model=step_transition_model,
                                                 hand_transition_model=hand_transition_model,
@@ -950,7 +949,7 @@ def main(contact_sequence_generation_method='all_planning',
                                                 other_motion_modes=[last_motion_mode],
                                                 heuristics='euclidean',
                                                 exact_goal_pose=connection_goal_pose,
-                                                planning_time_limit=start_time+planning_time_limit-dh_grid_copy_time-time.time(),
+                                                planning_time_limit=start_time+planning_time_limit-torso_pose_grid_copy_time-time.time(),
                                                 skip_state_feasibility_test=True,
                                                 initial_G_h_ratio=2.0)
 
@@ -962,7 +961,7 @@ def main(contact_sequence_generation_method='all_planning',
                         else:
                             rave.raveLogError('Connection Planning Fail.')
                             planning_healthy = False
-                            if planning_time_limit is not None and start_time+planning_time_limit-dh_grid_copy_time-time.time() < 0:
+                            if planning_time_limit is not None and start_time+planning_time_limit-torso_pose_grid_copy_time-time.time() < 0:
                                 rave.raveLogError('Time Out!')
                             rave.raveLogError('Cannot find a solution trajectory for this environment.')
                             break
@@ -982,7 +981,7 @@ def main(contact_sequence_generation_method='all_planning',
 
             connecting_contact_planning_time = time.time() - last_time_stamp ##! planning time for connecting segments
 
-            if planning_healthy and planning_time_limit is not None and start_time+planning_time_limit-dh_grid_copy_time-time.time() < 0:
+            if planning_healthy and planning_time_limit is not None and start_time+planning_time_limit-torso_pose_grid_copy_time-time.time() < 0:
                 rave.raveLogError('Time Out!')
                 planning_healthy = False
 
@@ -1006,7 +1005,7 @@ def main(contact_sequence_generation_method='all_planning',
                                                                             num_segments,
                                                                             num_segment_completed_using_planning,
                                                                             num_segment_completed_using_retrieval,
-                                                                            dh_grid_construction_time,
+                                                                            torso_pose_grid_construction_time,
                                                                             cpp_feature_vector_calculation_time,
                                                                             torso_path_planning_time,
                                                                             torso_path_segmentation_time,
