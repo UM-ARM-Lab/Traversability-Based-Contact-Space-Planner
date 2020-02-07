@@ -13,17 +13,9 @@ from transformation_conversion import *
 if __name__ == "__main__":
     env = rave.Environment()  # create openrave environment
 
-    f = open(planning_data_path + 'step_transition_model_wide_range.txt','r')
-    line = ' '
-    step_transition_model = []
-    while(True):
-        line = f.readline()
-        if(line == ''):
-            break
-        step_transition_model.append((float(line[0:5]),float(line[6:11]),float(line[12:17])))
-    f.close()
-
     or_robot = load_escher.escher(env)
+    step_transition_model = or_robot.step_transition_model
+
     leg_manip_list = ['l_leg','r_leg']
 
     foot_transition_long_radius = or_robot.foot_transition_long_radius

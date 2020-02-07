@@ -69,3 +69,16 @@ Example Usage:
 ```
 python humanoid_motion_planner.py contact_sequence_generation_method hybrid traversability_threshold_type mean path_segmentation_type motion_mode_and_traversability_segmentation environment_path environment_two_corridor surface_source load_from_data start_env_id 0 end_env_id 0
 ```
+
+Using A Different Robot Model
+-----
+
+To swap a robot model, check the the comments in `load_escher.py`, and define all corresponding variables for the new robot model to create a robot loading function. Then swap all `load_escher` functions with the newly defined robot loading function.
+
+Training Traversability Regressor
+-----
+
+To train traversability regressor, first generate the footstep_window, which precomputes all the footstep location given a torso transition. Then collect training data for each separate regressor mode (legs_only, legs_and_one_hand, all_manipulators). Finally, train the model with the training data. In summary, run the scripts with the following steps:
+1. `python transition_footstep_window_generator.py` (Generate footstep_window)
+2. `python traversability_training_data_collector.py batch_id [training data batch id] mode [legs_only,legs_and_one_hand,all_manipulators] sample_env_num [number of sampling environment] surface_source [environment name]` (Collect training data for each mode.)
+3. `python traversability_regressor_training.py mode [legs_only,legs_and_one_hand,all_manipulators]` (Train traversability regressor for each mode.)

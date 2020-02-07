@@ -61,6 +61,9 @@ class HumanoidRobot:
         self.max_foot_transition_dist = None
         self.max_hand_transition_dist = None
 
+        self.step_transition_model = []
+        self.hand_transition_model = []
+
         ###############################################################
 
         self.foot_collision_box_1 = None

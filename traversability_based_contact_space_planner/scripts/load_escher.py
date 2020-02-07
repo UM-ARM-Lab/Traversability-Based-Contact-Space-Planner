@@ -1,5 +1,8 @@
+from __future__ import print_function
+
 from robot import HumanoidRobot
 from transformation_conversion import *
+from config_parameter import *
 
 import numpy as np
 import openravepy as rave
@@ -37,12 +40,36 @@ def escher(env, active_dof_mode='whole_body', urdf_name=None):
     escher.manip.r_leg.SetLocalToolDirection(np.array([0, 0, -1]))
 
     # Specify the end-effector dimensions. We assume the robot has rectangular contacts.
-    escher.foot_h = 0.25
-    escher.foot_w = 0.135
-    escher.hand_h = 0.20
-    escher.hand_w = 0.14
+    escher.foot_h = 0.25   # foot length
+    escher.foot_w = 0.135  # foot width
+    escher.hand_h = 0.20   # hand length
+    escher.hand_w = 0.14   # hand width
     escher.foot_radius = math.sqrt((escher.foot_h/2.0)**2 + (escher.foot_w/2.0)**2)
     escher.hand_radius = math.sqrt((escher.hand_h/2.0)**2 + (escher.hand_w/2.0)**2)
+
+    # Load transition model
+    # Load the hand transition model (projection vector from the virtual shoulder point defined by (shoulder_w/2, shoulder_z))
+    hand_pitch = [-100.0,-90.0,-80.0,-70.0,-60.0,-50.0,-40.0,-30.0,-20.0,-10.0,0.0,10.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0,100.0]
+    hand_yaw = [-20.0,0.0,20.0]
+    for pitch in hand_pitch:
+        for yaw in hand_yaw:
+            escher.hand_transition_model.append((pitch,yaw))
+    escher.hand_transition_model.append((-99.0,-99.0))
+
+    # Load the foot transition model ((x,y,theta) of the new left foot relative to a standing right foot)
+    try:
+        print('Load step_transition_model...', end='')
+        f = open(planning_data_path + 'step_transition_model_wide_range.txt','r')
+        line = ' '
+        while True:
+            line = f.readline()
+            if line == '':
+                break
+            escher.step_transition_model.append((float(line[0:5]),float(line[6:11]),float(line[12:17])))
+        f.close()
+        print('Done.')
+    except Exception:
+        raw_input('Fail.')
 
     # Specify the robot's dimension
     escher.robot_z = 0.9 # robot waist height

@@ -118,39 +118,8 @@ def main(contact_sequence_generation_method='all_planning',
     rave.raveLogInfo('Load and Initialize the Robot.')
 
     or_robot = load_escher.escher(env)
-
-    ########################################################################
-    # Load transition model
-
-    # Load the hand transition model
-    hand_transition_model = []
-    hand_pitch = [-100.0,-90.0,-80.0,-70.0,-60.0,-50.0,-40.0,-30.0,-20.0,-10.0,0.0,10.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0,100.0]
-    hand_yaw = [-20.0,0.0,20.0]
-    for pitch in hand_pitch:
-        for yaw in hand_yaw:
-            hand_transition_model.append((pitch,yaw))
-    hand_transition_model.append((-99.0,-99.0))
-
-    # Load the foot transition model
-    try:
-        print('Load step_transition_model...', end='')
-        f = open(planning_data_path + 'step_transition_model_wide_range.txt','r')
-        line = ' '
-        step_transition_model = []
-
-        while True:
-            line = f.readline()
-            if line == '':
-                break
-
-            step_transition_model.append((float(line[0:5]),float(line[6:11]),float(line[12:17])))
-
-        f.close()
-        print('Done.')
-    except Exception:
-        raw_input('Fail.')
-
-    ########################################################################
+    step_transition_model = or_robot.step_transition_model
+    hand_transition_model = or_robot.hand_transition_model
 
     global contact_draw_handles
 

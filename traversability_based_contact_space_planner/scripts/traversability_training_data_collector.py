@@ -200,32 +200,15 @@ def main(batch_id=0,mode='all_manipulators',sample_env_num=1000,surface_source='
     higher_limits = or_robot.higher_limits
     IKInitDOFValues = or_robot.IKInitDOFValues
 
+    step_transition_model = or_robot.step_transition_model
+    hand_transition_model = or_robot.hand_transition_model
+
     resolution = map_grid_resolution
 
     max_x = 2.0
     min_x = -2.0
     max_y = 2.0
     min_y = -2.0
-
-    # get the transition models
-    f = open(planning_data_path + 'step_transition_model_wide_range.txt','r')
-    line = ' '
-    step_transition_model = []
-
-    while(True):
-        line = f.readline()
-        if(line == ''):
-            break
-        step_transition_model.append((float(line[0:5]),float(line[6:11]),float(line[12:17])))
-    f.close()
-
-    hand_transition_model = []
-    hand_pitch = [-100.0,-90.0,-80.0,-70.0,-60.0,-50.0,-40.0,-30.0,-20.0,-10.0,0.0,10.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0,100.0]
-    hand_yaw = [-20.0,0.0,20.0]
-    for pitch in hand_pitch:
-        for yaw in hand_yaw:
-            hand_transition_model.append((pitch,yaw))
-
 
     # construct possible next contact list
     (possible_next_transition_given_torso,possible_next_step) = get_possible_transitions_and_steps(step_transition_model)
