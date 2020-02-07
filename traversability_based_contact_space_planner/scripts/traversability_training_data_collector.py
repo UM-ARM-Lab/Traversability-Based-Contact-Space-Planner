@@ -182,7 +182,7 @@ def get_feasible_step_combinations(or_robot,general_ik_interface,structures,stru
     return feasible_step_combination
 
 
-def main(batch_id=0,motion_mode='all_manipulators',sample_env_num=1000):
+def main(batch_id=0,mode='all_manipulators',sample_env_num=1000,surface_source='flat_ground_environment'):
 
     ## initialization of new random environment
     env_handler = environment_handler()
@@ -266,7 +266,7 @@ def main(batch_id=0,motion_mode='all_manipulators',sample_env_num=1000):
         print('Environment Number: %d.'%(sample_env_counter))
 
         # Initialize the new sampled environment
-        env_handler.update_environment(or_robot)
+        env_handler.update_environment(or_robot,surface_source=surface_source)
         structures = env_handler.structures
         structures_dict = {}
         for struct in structures:
@@ -384,7 +384,7 @@ def main(batch_id=0,motion_mode='all_manipulators',sample_env_num=1000):
 
                 print('New Goal: %5.3f,%5.3f,%5.3f. Feature: (%5.3f,%5.3f,%5.3f,%5.3f,%5.3f).'%(goal_x,goal_y,goal_theta,feature[0],feature[1],feature[2],feature[3],feature[4]))
 
-                if feature[0] == 0 or (motion_mode != 'legs_only' and feature[1] == 0 and feature[2] == 0 and feature[3] == 0 and feature[4] == 0):
+                if feature[0] == 0 or (mode != 'legs_only' and feature[1] == 0 and feature[2] == 0 and feature[3] == 0 and feature[4] == 0):
                     continue
 
                 initial_node_copy = copy.deepcopy(initial_node)
@@ -394,7 +394,7 @@ def main(batch_id=0,motion_mode='all_manipulators',sample_env_num=1000):
                                                    initial_node_copy.right_arm,
                                                    or_robot,
                                                    torso_pose_grid,
-                                                   motion_mode=motion_mode_name_index_dict[motion_mode],
+                                                   motion_mode=traversability_regressor_mode_name_index_dict[mode],
                                                    goal=(goal_x,goal_y,goal_theta))
                 initial_node_copy.parent = None
 
@@ -407,7 +407,7 @@ def main(batch_id=0,motion_mode='all_manipulators',sample_env_num=1000):
                                 initial_node=initial_node_copy,
                                 step_transition_model=step_transition_model,
                                 hand_transition_model=hand_transition_model,
-                                motion_mode=motion_mode_name_index_dict[motion_mode],
+                                motion_mode=traversability_regressor_mode_name_index_dict[mode],
                                 planning_time_limit=-1.0,
                                 collect_training_data=True)
 
@@ -431,7 +431,7 @@ def main(batch_id=0,motion_mode='all_manipulators',sample_env_num=1000):
 
 if __name__ == "__main__":
     batch_id = 0
-    motion_mode = 'all_manipulators'
+    mode = 'all_manipulators'
     sample_env_num = 1000
 
     i = 1
@@ -442,17 +442,19 @@ if __name__ == "__main__":
 
         if command == 'batch_id':
             batch_id = sys.argv[i]
-        elif command == 'motion_mode':
-            motion_mode = sys.argv[i]
-            if motion_mode not in motion_mode_list:
-                rave.raveLogInfo('Unknown motion mode: %s. Abort.'%(motion_mode))
+        elif command == 'mode':
+            mode = sys.argv[i]
+            if mode not in traversability_regressor_mode_list:
+                rave.raveLogInfo('Unknown motion mode: %s. Abort.'%(mode))
                 sys.exit()
         elif command == 'sample_env_num':
             sample_env_num = int(sys.argv[i])
+        elif command == 'surface_source':
+            surface_source = sys.argv[i]
         else:
             rave.raveLogInfo('Invalid command: %s. Abort.'%(command))
             sys.exit()
 
         i += 1
 
-    main(batch_id,motion_mode,sample_env_num)
+    main(batch_id,mode,sample_env_num,surface_source)

@@ -15,8 +15,6 @@ from config_parameter import *
 from transformation_conversion import *
 from drawing_functions import *
 
-mode_list = ['full_manipulators', 'legs_and_one_hand', 'legs_only']
-
 def main(mode, new_data_filenames):
 
     ## Load training data

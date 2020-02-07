@@ -36,6 +36,8 @@ foot_contact_point_resolution = 0.025
 motion_mode_list = ['all_manipulators','legs_and_left_arm','legs_and_right_arm','legs_only']
 motion_mode_name_index_dict = {name:index for index,name in enumerate(motion_mode_list)}
 motion_mode_color_dict = {0:(1,0,0), 1:(0,0,1), 2:(1,1,0), 3:(0,1,0)}
+traversability_regressor_mode_list = ['full_manipulators', 'legs_and_one_hand', 'legs_only']
+traversability_regressor_mode_name_index_dict = {'full_manipulators':0, 'legs_and_one_hand':1, 'legs_only':3}
 
 # generate trajectory
 generate_trajectory = True
