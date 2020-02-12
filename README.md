@@ -20,7 +20,7 @@ Setup
   or from github:
   ```
   git clone https://github.com/cddlib/cddlib.git
-  cd cddlib-094h
+  cd cddlib
   git checkout 0.94h
   ```
   Install cddlib and dependencies:
